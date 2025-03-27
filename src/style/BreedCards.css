@@ -1,0 +1,136 @@
+/* Container */
+.container {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 30px;
+    padding: 40px;
+    background-color: #f5f7fa;
+}
+
+/* Card Styling */
+.card {
+    width: 300px;
+    background: white;
+    border-radius: 10px;
+    box-shadow: 0px 5px 10px rgba(0, 0, 0, 0.2);
+    text-align: center;
+    padding: 20px;
+    cursor: pointer;
+    transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+    position: relative;
+}
+
+.card:hover {
+    transform: scale(1.05);
+    box-shadow: 0px 10px 20px rgba(0, 0, 0, 0.25);
+}
+
+.card-image {
+    width: 100%;
+    height: 180px;
+    border-radius: 10px;
+    object-fit: cover;
+}
+
+.card-title {
+    font-size: 22px;
+    margin-top: 15px;
+    font-weight: bold;
+    color: #333;
+}
+
+/* Modal Styling */
+.modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.3s ease-in-out, visibility 0.3s ease-in-out;
+}
+
+.modal.show {
+    opacity: 1;
+    visibility: visible;
+}
+
+.modal-content {
+    background: white;
+    padding: 25px;
+    border-radius: 12px;
+    width: 520px;
+    max-width: 90%;
+    text-align: left;
+    box-shadow: 0px 8px 16px rgba(0, 0, 0, 0.3);
+}
+
+/* Table Styling */
+.breed-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 15px;
+    font-size: 16px;
+}
+
+.breed-table th,
+.breed-table td {
+    border: 1px solid #ddd;
+    padding: 14px;
+    text-align: left;
+}
+
+.breed-table th {
+    background-color: #f0f0f0;
+    font-weight: bold;
+}
+
+/* Buttons */
+.button-container {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 15px;
+}
+
+.info-btn, .close-btn {
+    padding: 10px 16px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 14px;
+    transition: all 0.2s ease-in-out;
+}
+
+.info-btn {
+    background: #0275d8;
+    color: white;
+}
+
+.info-btn:hover {
+    background: #025aa5;
+}
+
+.close-btn {
+    background: #d9534f;
+    color: white;
+}
+
+.close-btn:hover {
+    background: #b52b27;
+}
+
+/* General Info */
+.general-info {
+    margin-top: 12px;
+    padding: 12px;
+    background: #f9f9f9;
+    border-left: 4px solid #0275d8;
+    font-size: 15px;
+    line-height: 1.5;
+}

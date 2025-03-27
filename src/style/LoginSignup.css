@@ -1,0 +1,118 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap');
+
+.login-container {
+    height: 100vh;
+    background: url('../images/cow-bg.jpg') no-repeat top center/cover; /* Ensures farmer’s face is visible */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-family: 'Inter', sans-serif;
+    padding-top: 20px;
+}
+
+/* Darker login box for better contrast */
+.login-box {
+    background: rgba(0, 0, 0, 0.65); /* Darker background for strong contrast */
+    backdrop-filter: blur(12px);
+    padding: 50px;
+    border-radius: 18px;
+    box-shadow: 0 8px 22px rgba(0, 0, 0, 0.6); /* Stronger shadow for depth */
+    text-align: center;
+    width: 420px;
+    color: #ffffff;
+}
+
+.login-box h2 {
+    margin-bottom: 14px;
+    font-size: 28px;
+    font-weight: 700;
+}
+
+.login-box p {
+    font-size: 16px;
+    margin-bottom: 22px;
+    opacity: 0.95;
+    font-weight: 500;
+}
+
+/* Inputs now have higher contrast */
+.input-container {
+    display: flex;
+    align-items: center;
+    background: rgba(255, 255, 255, 0.15); /* Darker input background */
+    border-radius: 12px;
+    padding: 14px;
+    margin: 12px 0;
+    transition: 0.3s ease;
+}
+
+.input-container .icon {
+    color: white;
+    margin-right: 14px;
+    font-size: 22px;
+}
+
+.input-container input {
+    width: 100%;
+    border: none;
+    background: transparent;
+    outline: none;
+    font-size: 18px;
+    color: white;
+    font-weight: 500;
+}
+
+.input-container input::placeholder {
+    color: rgba(255, 255, 255, 0.8);
+    font-weight: 500;
+}
+
+.input-container:focus-within {
+    background: rgba(255, 255, 255, 0.2); /* Higher contrast focus */
+}
+
+/* Buttons with improved hover effect */
+.login-box button {
+    width: 100%;
+    padding: 16px;
+    background: #ff9900c3;
+    border: none;
+    color: white;
+    font-size: 18px;
+    font-weight: bold;
+    border-radius: 12px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 14px rgba(255, 166, 0, 0.485);
+}
+
+.login-box button:hover {
+    background: #e68a00;
+    transform: scale(1.05);
+    box-shadow: 0 6px 18px rgba(255, 165, 0, 0.8);
+}
+
+.separator {
+    margin: 20px 0;
+    font-size: 16px;
+    opacity: 0.9;
+    font-weight: 600;
+}
+
+/* Google button with better contrast */
+.google-btn {
+    background: #ffffff;
+    color: #222;
+    font-size: 16px;
+    font-weight: bold;
+    padding: 14px;
+    border-radius: 10px;
+    transition: 0.3s ease;
+    box-shadow: 0 3px 12px rgba(0, 0, 0, 0.3);
+}
+
+.google-btn:hover {
+    background: #f0f0f0;
+    transform: scale(1.05);
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.4);
+}
