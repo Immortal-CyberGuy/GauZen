@@ -3,7 +3,7 @@ import BreedCards from "../components/BreedCards.jsx";
 import BreedSearchBar from "../components/BreedSearchBar.jsx";
 import CowFAQ from "../components/CowFAQ.jsx"; 
 
-function FarmerEducation() {
+function CowPedia() {
   return (
     <div>
       <BreedSearchBar />
@@ -13,4 +13,4 @@ function FarmerEducation() {
   );
 }
 
-export default FarmerEducation;
+export default CowPedia;

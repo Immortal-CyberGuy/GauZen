@@ -1,6 +1,6 @@
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import Home from "./pages/Home";
-import FarmerEducation from "./pages/FarmerEducation";
+import CowPedia from "./pages/CowPedia";
 // import ChatBot from "./pages/ChatBot";
 import BreedMatching from "./pages/BreedMatching";
 import Marketplace from "./pages/MarketPlace";
@@ -13,7 +13,7 @@ function App() {
       <Navbar /> {/* Include Navbar */}
       <Routes>
         <Route path="/" element={<Home />} />
-        <Route path="/farmer-education" element={<FarmerEducation />} />
+        <Route path="/cow-pedia" element={<CowPedia />} />
         <Route path="/breed-matching" element={<BreedMatching />} />
         <Route path="/marketplace" element={<Marketplace />} />
       </Routes>
