@@ -10,7 +10,7 @@ const MTD = () => {
         A dedicated developer, passionate about crafting seamless applications and solving real-world challenges with precision.
       </p>
       <Card className="developer-card">
-        <img src="your-image-url.jpg" alt="Developer" className="developer-image" />
+        <img src="/images/me.jpg" alt="Developer" className="developer-image" />
       </Card>
     </section>
   );
