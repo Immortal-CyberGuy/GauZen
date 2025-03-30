@@ -1,11 +1,9 @@
 import React from "react";
-import LoginSignup from "../components/LoginSignup.jsx";
+
 
 const Home = () => {
   return (
-    <div>
-      <LoginSignup />
-    </div>
+    <h1>Welcome to GauSeva</h1>
   );
 };
 

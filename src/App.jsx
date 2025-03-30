@@ -1,6 +1,8 @@
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import Home from "./pages/Home";
 import CowPedia from "./pages/CowPedia";
+import Login from "./pages/Login";
+import SignUp from "./pages/SignUp";
 import BreedMatching from "./pages/BreedMatching";
 import Marketplace from "./pages/MarketPlace";
 import Footer from "./components/Footer"; 
@@ -17,6 +19,8 @@ function App() {
             <Route path="/cow-pedia" element={<CowPedia />} />
             <Route path="/breed-matching" element={<BreedMatching />} />
             <Route path="/marketplace" element={<Marketplace />} />
+            <Route path="/login" element={<Login />} />
+            <Route path="/signup" element={<SignUp />} />
           </Routes>
         </div>
         <Footer />
