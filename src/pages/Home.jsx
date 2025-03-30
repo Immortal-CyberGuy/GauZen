@@ -1,9 +1,11 @@
 import React from "react";
+import MTD from "../components/MTD.jsx";
 
 
 const Home = () => {
   return (
-    <h1>Welcome to GauZen</h1>
+    
+    <MTD />
   );
 };
 
