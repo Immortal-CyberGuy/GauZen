@@ -10,7 +10,7 @@ const Footer = () => {
         <div className="footer-grid">
           {/* Brand Section */}
           <div className="footer-section">
-            <h3 className="footer-title">GauSeva</h3>
+            <h3 className="footer-title">GauZen</h3>
             <p className="footer-description">
             Empowering Cattle Farmers with AI-Driven Solutions!
             </p>
@@ -49,7 +49,7 @@ const Footer = () => {
             <div className="footer-contact">
               <Mail size={16} />
               <a href="mailto:gargshubham2411@gmail.com" className="footer-link">
-                support@gauseva.app
+                support@gauzen.app
               </a>
             </div>
           </div>
@@ -58,7 +58,7 @@ const Footer = () => {
         {/* Bottom Bar */}
         <div className="footer-bottom">
           <p className="footer-text">
-            © {currentYear} Gauseva. All rights reserved.
+            © {currentYear} GauZen. All rights reserved.
           </p>
           <div className="footer-policy">
             <a href="#" className="footer-link">Privacy Policy</a>

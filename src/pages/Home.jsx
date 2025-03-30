@@ -3,7 +3,7 @@ import React from "react";
 
 const Home = () => {
   return (
-    <h1>Welcome to GauSeva</h1>
+    <h1>Welcome to GauZen</h1>
   );
 };
 

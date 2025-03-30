@@ -15,7 +15,7 @@ function Navbar() {
             <div className="logo-circle">
               <GiCow className="logo-icon" />
             </div>
-            <span className="logo-text">GauSeva</span>
+            <span className="logo-text">GauZen</span>
           </div>
         </Link>
       </div>
