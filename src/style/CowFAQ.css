@@ -47,6 +47,7 @@
     justify-content: space-between;
     align-items: center;
     transition: background 0.3s ease-in-out;
+    color: #333;
 }
 
 .faq-question:hover {
