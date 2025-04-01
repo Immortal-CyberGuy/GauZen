@@ -27,7 +27,7 @@
 
 /* FAQ Item */
 .faq-item {
-    background: #f8f9fa;
+    background: #f8f9fa; /* Light background for the items */
     border-radius: 8px;
     overflow: hidden;
     transition: all 0.3s ease-in-out;
@@ -36,10 +36,11 @@
 /* FAQ Question */
 .faq-question {
     width: 100%;
-    background: none;
+    background: #f1f3f5; /* Light grey background */
+    color: #333; /* Dark text for readability */
     border: none;
     text-align: left;
-    padding: 15px;
+    padding: 18px 20px;
     font-size: 18px;
     font-weight: bold;
     cursor: pointer;
@@ -47,18 +48,17 @@
     justify-content: space-between;
     align-items: center;
     transition: background 0.3s ease-in-out;
-    color: #333;
 }
 
 .faq-question:hover {
-    background: #e9ecef;
+    background: #e9ecef; /* Slightly darker grey on hover */
 }
 
 /* Toggle Icon */
 .faq-toggle {
     font-size: 24px;
     font-weight: bold;
-    color: #007bff;
+    color: #007bff; /* Blue icon for visibility */
     transition: transform 0.3s ease-in-out;
 }
 
