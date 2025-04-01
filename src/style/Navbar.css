@@ -9,15 +9,14 @@
 body {
     font-family: 'Inter', sans-serif;
     background: #f5f7fa;
-    padding-top: 80px;
+  
 }
 
 /* 🔵 NAVBAR */
+/* 🔵 NAVBAR */
 .navbar {
-    position: fixed;
-    top: 0;
-    left: 50%;
-    transform: translateX(-50%);
+    position: relative;
+    margin: 0 auto;
     width: 90%;
     max-width: 1300px;
     display: flex;
@@ -31,6 +30,7 @@ body {
     z-index: 1000;
     transition: all 0.3s ease-in-out;
 }
+
 
 /* 🔵 LOGO */
 .navbar-logo .logo-link {

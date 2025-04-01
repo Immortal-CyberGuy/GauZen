@@ -37,7 +37,7 @@
     transition: all 0.3s ease-in-out;
     backdrop-filter: blur(15px);
     border: 2px solid rgba(255, 255, 255, 0.25);
-
+    background-color: #fad0c4;
     /* ✨ 🔥 NEW Premium Gradient-Glass Look */
     background: linear-gradient(135deg, rgba(255, 255, 255, 0.25), rgba(200, 225, 255, 0.15));
     
@@ -61,7 +61,7 @@
 /* --- On Click: Dark Mode Activation --- */
 .developer-card.active {
     background: #222;
-    color: white;
+    color: rgb(207, 83, 83);
     border: 2px solid rgba(255, 255, 255, 0.5);
     box-shadow: none;
 }
