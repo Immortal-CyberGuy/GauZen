@@ -1,10 +1,10 @@
 import React from "react";
-import LoginSignup from "../components/LoginSignup.jsx";
+import LoginSignup from "../components/LoginSignup";
 
-const Login= () => {
+const Login = () => {
   return (
     <div>
-      <LoginSignup />
+      <LoginSignup type="login" />
     </div>
   );
 };
