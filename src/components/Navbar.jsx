@@ -5,10 +5,10 @@ import { GiCow, GiFarmTractor } from "react-icons/gi";
 import { TbArrowsExchange } from "react-icons/tb";
 import "../style/Navbar.css";
 
-function Navbar() {
+function Navbar({ openMarketplace }) {
   return (
     <header className="navbar">
-      {/* Premium Logo */}
+      {/* Logo */}
       <div className="navbar-logo">
         <Link to="/" className="logo-link">
           <div className="logo-container">
@@ -20,17 +20,27 @@ function Navbar() {
         </Link>
       </div>
 
-      {/* Navigation Links with Icons */}
+      {/* Navigation Links */}
       <nav className="navbar-links">
-        <Link to="/cow-pedia" className="nav-link"><GiCow className="nav-icon" /> CowPedia</Link>
-        <Link to="/breed-matching" className="nav-link"><TbArrowsExchange className="nav-icon" /> Breed Matching</Link>
-        <Link to="/marketplace" className="nav-link"><GiFarmTractor className="nav-icon" /> Marketplace</Link>
+        <Link to="/cow-pedia" className="nav-link">
+          <GiCow className="nav-icon" /> CowPedia
+        </Link>
+        <Link to="/breed-matching" className="nav-link">
+          <TbArrowsExchange className="nav-icon" /> Breed Matching
+        </Link>
+        <Link to="#" className="nav-link" onClick={openMarketplace}>
+          <GiFarmTractor className="nav-icon" /> Marketplace
+        </Link>
       </nav>
 
       {/* Authentication Buttons */}
       <div className="auth-buttons">
-        <Link to="/login" className="login-link"><FiLogIn className="nav-icon" /> Login</Link>
-        <Link to="/signup" className="signup-button"><FaUserPlus className="nav-icon" /> Sign Up</Link>
+        <Link to="/login" className="login-link">
+          <FiLogIn className="nav-icon" /> Login
+        </Link>
+        <Link to="/signup" className="signup-button">
+          <FaUserPlus className="nav-icon" /> Sign Up
+        </Link>
       </div>
     </header>
   );

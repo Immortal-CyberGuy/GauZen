@@ -51,6 +51,8 @@ const Footer = () => {
               <a href="mailto:gargshubham2411@gmail.com" className="footer-link">
                 support@gauzen.app
               </a>
+              
+              <a href ="https://youtu.be/r6zIGXun57U?si=lovBUerOq9lnRzs6" className="footer-link">Easter Egg</a>
             </div>
           </div>
         </div>

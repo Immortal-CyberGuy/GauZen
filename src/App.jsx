@@ -4,27 +4,33 @@ import CowPedia from "./pages/CowPedia";
 import Login from "./pages/Login";
 import SignUp from "./pages/SignUp";
 import BreedMatching from "./pages/BreedMatching";
-import Marketplace from "./pages/MarketPlace";
-import Footer from "./components/Footer"; 
-import Navbar from "./components/Navbar"; 
+import Footer from "./components/Footer";
+import Navbar from "./components/Navbar";
+import Marketplace from "./components/MarketPlace";
+import { useState } from "react";
 
 function App() {
+  const [isMarketplaceOpen, setMarketplaceOpen] = useState(false);
+
   return (
     <div className="app-container">
       <Router>
-        <Navbar /> 
+        <Navbar openMarketplace={() => setMarketplaceOpen(true)} />
         <div className="main-content">
           <Routes>
             <Route path="/" element={<Home />} />
             <Route path="/cow-pedia" element={<CowPedia />} />
             <Route path="/breed-matching" element={<BreedMatching />} />
-            <Route path="/marketplace" element={<Marketplace />} />
             <Route path="/login" element={<Login />} />
             <Route path="/signup" element={<SignUp />} />
           </Routes>
         </div>
         <Footer />
       </Router>
+      <Marketplace
+        isOpen={isMarketplaceOpen}
+        onClose={() => setMarketplaceOpen(false)}
+      />
     </div>
   );
 }
