@@ -9,6 +9,7 @@ import Navbar from "./components/Navbar";
 import Marketplace from "./components/MarketPlace";
 import { useState } from "react";
 import ChatBot from "./components/Chatbot/ChatBot";
+import VetDoc from "./pages/VetDoc";
 
 function App() {
   const [isMarketplaceOpen, setMarketplaceOpen] = useState(false);
@@ -22,6 +23,7 @@ function App() {
             <Route path="/" element={<Home />} />
             <Route path="/cow-pedia" element={<CowPedia />} />
             <Route path="/breed-matching" element={<BreedMatching />} />
+            <Route path="/vet" element={<VetDoc />} />
             <Route path="/login" element={<Login />} />
             <Route path="/signup" element={<SignUp />} />
           </Routes>

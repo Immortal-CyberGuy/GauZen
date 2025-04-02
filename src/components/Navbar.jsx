@@ -1,6 +1,6 @@
 import { Link } from "react-router-dom";
 import { FiLogIn } from "react-icons/fi";
-import { FaUserPlus } from "react-icons/fa";
+import { FaUserPlus, FaStethoscope } from "react-icons/fa";
 import { GiCow, GiFarmTractor } from "react-icons/gi";
 import { TbArrowsExchange } from "react-icons/tb";
 import "../style/Navbar.css";
@@ -30,6 +30,9 @@ function Navbar({ openMarketplace }) {
         </Link>
         <Link to="#" className="nav-link" onClick={openMarketplace}>
           <GiFarmTractor className="nav-icon" /> Marketplace
+        </Link>
+        <Link to="/vet" className="nav-link">
+          <FaStethoscope className="nav-icon" /> Smart Vet Locator
         </Link>
       </nav>
 
