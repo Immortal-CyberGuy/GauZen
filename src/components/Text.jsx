@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { FiLogIn } from "react-icons/fi";
 import TypewriterEffect from "./TypewriterEffect";
@@ -12,8 +12,14 @@ const features = [
 ];
 
 const Text = () => {
+  const [loaded, setLoaded] = useState(false);
+
+  useEffect(() => {
+    setTimeout(() => setLoaded(true), 200); // Delay to make it feel smoother
+  }, []);
+
   return (
-    <div className="text-container">
+    <div className={`text-container ${loaded ? "fade-in" : ""}`}>
       <h1>
         AI-DRIVEN <span className="glow-text">COW CARE & BREEDING</span>
       </h1>

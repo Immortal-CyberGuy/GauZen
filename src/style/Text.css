@@ -1,3 +1,17 @@
+/* --- Initial hidden state --- */
+.text-container {
+    opacity: 0;
+    transform: translateY(40px);
+    transition: opacity 0.8s ease-out, transform 0.8s ease-out;
+}
+
+/* --- Fade in smoothly on load --- */
+.text-container.fade-in {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+
 .text-container {
     text-align: center;
     padding: 70px 20px;

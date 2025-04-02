@@ -1,3 +1,17 @@
+
+/* --- Initially hidden for smooth scroll effect --- */
+.video-section {
+    opacity: 0;
+    transform: translateY(50px);
+    transition: opacity 0.6s ease-out, transform 0.6s ease-out;
+}
+
+/* --- Show when scrolled into view --- */
+.video-section.show {
+    opacity: 1;
+    transform: translateY(0);
+}
+
 .video-section {
     text-align: center;
     padding: 80px 20px;

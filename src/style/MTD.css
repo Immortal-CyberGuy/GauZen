@@ -1,4 +1,20 @@
 /* --- Meet the Developer Section --- */
+/* --- Hide initially for scroll effect --- */
+.meet-developer {
+    opacity: 0;
+    transform: translateY(50px);
+    transition: opacity 0.6s ease-out, transform 0.6s ease-out;
+    
+}
+
+/* --- Show when scrolled into view --- */
+.meet-developer.show {
+    opacity: 1;
+    transform: translateY(0);
+    background: transparent;
+
+}
+
 .meet-developer {
     display: flex;
     flex-direction: column;
