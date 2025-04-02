@@ -104,7 +104,7 @@ const BreedMatching = () => {
 
       {matchingBreeds.length > 0 && !loading && (
         <div className="results-container">
-          <h3>Best Breeding Partners for {query}:</h3>
+          <h4>Best Breeding Partners for {query}:</h4>
           {matchingBreeds.map((partner, index) => (
             <div key={index} className="breed-card">
               <h4>{partner.breed}</h4>

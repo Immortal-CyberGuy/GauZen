@@ -17,6 +17,10 @@ body {
     font-family: 'Inter', sans-serif;
     background: var(--light-bg);
 }
+.container {
+    background: transparent;
+    
+}
 
 /* ✅ Chatbot Toggle Button */
 #chatbot-toggler {

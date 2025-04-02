@@ -2,8 +2,6 @@ import { Github, Youtube, Twitter, Mail } from "lucide-react";
 import "../style/Footer.css";
 
 const Footer = () => {
-  const currentYear = new Date().getFullYear();
-
   return (
     <footer className="footer">
       <div className="footer-container">
@@ -15,9 +13,9 @@ const Footer = () => {
               Empowering Cattle Farmers with AI-Driven Solutions.
             </p>
             <div className="footer-icons">
-              <a href="#" className="footer-icon"><Twitter size={20} /></a>
-              <a href="#" className="footer-icon"><Youtube size={20} /></a>
-              <a href="#" className="footer-icon"><Github size={20} /></a>
+              <a href="#" className="footer-icon"><Twitter size={16} /></a>
+              <a href="#" className="footer-icon"><Youtube size={16} /></a>
+              <a href="#" className="footer-icon"><Github size={16} /></a>
             </div>
           </div>
 
@@ -47,8 +45,8 @@ const Footer = () => {
           <div className="footer-section">
             <h4 className="footer-subtitle">Contact</h4>
             <div className="footer-contact">
-              <Mail size={16} />
-              <a href="mailto:gargshubham2411@gmail.com" className="footer-link">
+              <Mail size={14} />
+              <a href="gargshubham2411@gmail.com" className="footer-link">
                 support@gauzen.app
               </a>
             </div>
@@ -60,9 +58,7 @@ const Footer = () => {
 
         {/* Bottom Bar */}
         <div className="footer-bottom">
-          <p className="footer-text">
-            © {currentYear} GauZen. All rights reserved.
-          </p>
+          <p className="footer-text">© 2025 GauZen. All rights reserved.</p>
           <div className="footer-policy">
             <a href="#" className="footer-link">Privacy Policy</a>
             <a href="#" className="footer-link">Terms of Service</a>

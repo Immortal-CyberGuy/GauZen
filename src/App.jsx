@@ -10,6 +10,7 @@ import Marketplace from "./components/MarketPlace";
 import { useState } from "react";
 import ChatBot from "./components/Chatbot/ChatBot";
 import VetDoc from "./pages/VetDoc";
+import "./app.css";
 
 function App() {
   const [isMarketplaceOpen, setMarketplaceOpen] = useState(false);
@@ -18,6 +19,7 @@ function App() {
     <div className="app-container">
       <Router>
         <Navbar openMarketplace={() => setMarketplaceOpen(true)} />
+        
         <div className="main-content">
           <Routes>
             <Route path="/" element={<Home />} />
@@ -28,9 +30,13 @@ function App() {
             <Route path="/signup" element={<SignUp />} />
           </Routes>
         </div>
-        <Footer />
-        <ChatBot />
+
+        
       </Router>
+
+      <ChatBot />
+      <Footer />
+      
       <Marketplace
         isOpen={isMarketplaceOpen}
         onClose={() => setMarketplaceOpen(false)}

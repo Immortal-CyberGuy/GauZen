@@ -9,50 +9,54 @@
 body {
     font-family: 'Inter', sans-serif;
     background: #f5f7fa;
-  
 }
 
-/* 🔵 NAVBAR */
 /* 🔵 NAVBAR */
 .navbar {
     position: relative;
     margin: 0 auto;
-    width: 90%;
-    max-width: 1300px;
+    width: 95%; /* Navbar takes 95% of the screen width */
+    max-width: 1400px; /* Optional max-width to avoid it becoming too wide on larger screens */
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 12px 4%;
+    padding: 12px 0; /* Padding reduced to ensure even distribution of space */
     background: rgba(255, 255, 255, 0.9); /* Soft Glassmorphism */
-    backdrop-filter: blur(12px);
+    backdrop-filter: blur(10px); /* Subtle blur effect */
     border-radius: 50px;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-    z-index: 1;
+    z-index: 0;
     transition: all 0.3s ease-in-out;
 }
 
-
 /* 🔵 LOGO */
+.navbar-logo {
+    display: flex;
+    justify-content: flex-start; /* Align logo to the left */
+    flex: 1; /* Takes up available space on the left */
+    padding-left: 20px; /* Padding to provide spacing from the left */
+}
+
 .navbar-logo .logo-link {
     display: flex;
     align-items: center;
     text-decoration: none;
     color: #0a2540;
     font-size: 1.5rem;
-    font-weight: bold;
-    gap: 10px;
+    font-weight: 600;
+    gap: 8px;
     transition: all 0.3s ease-in-out;
 }
 
 .logo-container {
     display: flex;
     align-items: center;
-    gap: 10px;
+    gap: 8px;
 }
 
 .logo-circle {
-    width: 48px;
-    height: 48px;
+    width: 40px;
+    height: 40px;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -62,7 +66,7 @@ body {
 }
 
 .logo-icon {
-    font-size: 24px;
+    font-size: 20px;
     color: white;
     transition: transform 0.3s ease-in-out;
 }
@@ -71,10 +75,12 @@ body {
     color: #0077ff;
 }
 
-/* 🔵 NAV LINKS */
+/* 🔵 NAV LINKS (Centering and Even Spacing) */
 .navbar-links {
     display: flex;
-    gap: 20px;
+    justify-content: center; /* Centers the nav links */
+    gap: 40px; /* Even gap between each nav link */
+    flex: 2; /* Takes up more space to spread the links out evenly */
 }
 
 .nav-link {
@@ -84,20 +90,18 @@ body {
     color: #333;
     font-size: 1rem;
     font-weight: 500;
-    padding: 10px 18px;
-    border-radius: 50px; /* Rounded shape */
-    gap: 8px;
+    padding: 8px 16px;
+    border-radius: 30px;
+    gap: 6px;
     transition: all 0.3s ease-in-out;
 }
 
-/* Icons remain normal until hovered */
 .nav-icon {
     font-size: 18px;
     color: #555;
     transition: color 0.3s ease-in-out;
 }
 
-/* 🔥 RGB Hover Effect (Text + Icon Change) */
 .nav-link:hover {
     color: white;
     background: linear-gradient(45deg, rgb(0, 119, 255), rgb(204, 0, 255), rgb(0, 255, 204));
@@ -111,7 +115,6 @@ body {
     color: white;
 }
 
-/* RGB Gradient Animation */
 @keyframes rgbHover {
     0% { background-position: left; }
     100% { background-position: right; }
@@ -120,7 +123,10 @@ body {
 /* 🔵 AUTH BUTTONS */
 .auth-buttons {
     display: flex;
-    gap: 12px;
+    justify-content: flex-end; /* Aligns auth buttons to the right */
+    gap: 24px; /* Even space between login and signup buttons */
+    flex: 1; /* Takes up available space on the right */
+    padding-right: 20px; /* Padding for spacing on the right */
 }
 
 .login-link, .signup-button {
@@ -129,12 +135,12 @@ body {
     text-decoration: none;
     font-size: 1rem;
     font-weight: 500;
-    padding: 10px 18px;
-    border-radius: 50px;
+    padding: 8px 16px;
+    border-radius: 30px;
     transition: all 0.3s ease-in-out;
 }
 
-/* 🔹 LOGIN - Minimal */
+/* 🔹 LOGIN */
 .login-link {
     color: #222;
     border: 2px solid #0077ff;
@@ -146,7 +152,7 @@ body {
     background: #0077ff;
 }
 
-/* 🔥 SIGNUP - Premium */
+/* 🔥 SIGNUP */
 .signup-button {
     background: linear-gradient(135deg, rgb(0, 119, 255), rgb(0, 72, 212));
     color: white;
@@ -163,11 +169,15 @@ body {
 /* 🔵 RESPONSIVE DESIGN */
 @media (max-width: 1024px) {
     .navbar {
-        padding: 10px 3%;
+        padding: 12px 4%;
     }
 
     .navbar-links {
-        gap: 15px;
+        gap: 30px;
+    }
+
+    .auth-buttons {
+        gap: 16px;
     }
 }
 
@@ -175,16 +185,17 @@ body {
     .navbar {
         flex-direction: column;
         align-items: center;
-        padding: 14px;
+        padding: 16px 4%;
     }
 
     .navbar-links {
         flex-direction: column;
-        gap: 10px;
+        gap: 12px;
         align-items: center;
     }
 
     .auth-buttons {
-        margin-top: 10px;
+        margin-top: 12px;
+        gap: 20px;
     }
 }
