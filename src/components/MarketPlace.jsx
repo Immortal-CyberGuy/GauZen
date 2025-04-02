@@ -1,5 +1,5 @@
 import React, { useEffect } from "react";
-import "../style/Marketplace.css";
+import "../style/MarketPlace.css";
 import { PiRocketLaunchBold } from "react-icons/pi";
 
 const Marketplace = ({ isOpen, onClose }) => {
