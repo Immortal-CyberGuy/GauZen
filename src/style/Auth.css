@@ -1,145 +1,135 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap');
 
+:root {
+    --primary-bg: rgba(255, 255, 255, 0.3);
+    --primary-text: #2c3e50;
+    --secondary-text: #6c757d;
+    --border-color: #dee2e6;
+    --btn-primary: #007bff;
+    --btn-primary-hover: #0056b3;
+    --btn-accent: #ff9900;
+    --btn-accent-hover: #e68a00;
+}
+
+/* Full-Page Background */
 .auth-container {
-    height: 100vh;
+    min-height: 100vh;
     display: flex;
     justify-content: center;
     align-items: center;
     font-family: 'Inter', sans-serif;
-    background: url('../images/cow-bg.jpg') no-repeat top center/cover;
+    background: url('../images/cow-bg.jpg') no-repeat center top / cover;
     position: relative;
     overflow: hidden;
 }
 
-/* Initial background overlay */
-.auth-overlay {
+/* Lightened Overlay for Visibility */
+.auth-container .auth-overlay {
     position: absolute;
     width: 100%;
     height: 100%;
-    background: rgba(0, 0, 0, 0); /* Starts clear */
+    background: rgba(255, 255, 255,0.1);
     transition: background 0.5s ease-in-out;
 }
 
-/* Darker overlay after 0.5s */
-.auth-overlay.dark {
-    background: rgba(0, 0, 0, 0.6);
+.auth-container .auth-overlay.dark {
+    background: rgba(255, 255, 255, 0.4);
 }
 
-/* Login/Signup Box */
-.auth-box {
+/* Auth Box */
+.auth-container .auth-box {
     position: relative;
-    background: rgba(255, 255, 255, 0.15);
-    backdrop-filter: blur(15px);
+    background: var(--primary-bg);
+    backdrop-filter: blur(20px);
     padding: 50px;
     border-radius: 15px;
-    box-shadow: 0 8px 18px rgba(0, 0, 0, 0.6);
+    box-shadow: 0 8px 18px rgba(0, 0, 0, 0.15);
     text-align: center;
-    width: 420px;
-    color: white;
+    width: 440px;
+    color: var(--primary-text);
     opacity: 0;
     transform: translateY(20px);
     transition: opacity 0.5s ease-in-out, transform 0.5s ease-in-out;
 }
 
-/* Show form after delay */
-.auth-box.visible {
+.auth-container .auth-box.visible {
     opacity: 1;
     transform: translateY(0);
 }
 
-/* Headings and text */
-.auth-box h2 {
+/* Title & Text */
+.auth-container h2 {
     font-size: 26px;
-    font-weight: bold;
+    font-weight: 600;
     margin-bottom: 10px;
+    color: var(--primary-text);
 }
 
-.auth-box p {
+.auth-container p {
     font-size: 16px;
-    opacity: 0.85;
+    color: var(--secondary-text);
     margin-bottom: 20px;
 }
 
 /* Input Fields */
-.input-container {
+.auth-container .input-container {
     display: flex;
     align-items: center;
-    background: rgba(255, 255, 255, 0.2);
+    background: rgba(255, 255, 255, 0.5);
     border-radius: 12px;
     padding: 14px;
     margin: 10px 0;
     position: relative;
 }
 
-.input-container input {
+.auth-container input {
     width: 100%;
     border: none;
     background: transparent;
     outline: none;
     font-size: 17px;
-    color: white;
+    color: var(--primary-text);
     font-weight: 500;
-    padding-right: 40px; /* Space for the eye icon */
-    z-index: 2; /* Ensure the input is above the eye icon */
+    padding-right: 40px;
 }
 
-.input-container input::placeholder {
-    color: rgba(255, 255, 255, 0.8);
+.auth-container input::placeholder {
+    color: var(--secondary-text);
 }
 
 /* Password Toggle */
-.password-toggle {
+.auth-container .password-toggle {
     position: absolute;
     right: 15px;
     top: 50%;
     transform: translateY(-50%);
     cursor: pointer;
     font-size: 20px;
-    color: white;
-    z-index: 3; /* Ensure the eye icon is on top of input */
+    color: var(--primary-text);
 }
 
-/* Password Strength Indicator */
-.password-strength {
-    font-size: 12px;
-    margin-top: 5px;
-    color: rgba(255, 255, 255, 0.75);
-    font-weight: bold;
-}
-
-/* Password Validation Checklist */
-.password-checklist {
+/* Password Checklist */
+.auth-container .password-checklist {
     margin-top: 15px;
     text-align: left;
     font-size: 14px;
-    color: white;
+    color: var(--primary-text);
 }
 
-.password-checklist input {
-    margin-right: 10px;
-}
-
-.password-checklist li {
-    margin-bottom: 8px;
-    display: flex;
-    align-items: center;
-}
-
-/* Remove bullets and use checkboxes */
-.password-checklist ul {
+.auth-container .password-checklist ul {
     list-style-type: none;
     padding: 0;
 }
 
-.password-checklist input[type="checkbox"] {
+.auth-container .password-checklist input[type="checkbox"] {
     margin-right: 10px;
 }
 
 /* Buttons */
-button {
+.auth-container button {
     width: 100%;
     padding: 14px;
-    background: #ff9900c3;
+    background: var(--btn-accent);
     border: none;
     color: white;
     font-size: 18px;
@@ -150,23 +140,23 @@ button {
     box-shadow: 0 4px 12px rgba(255, 166, 0, 0.4);
 }
 
-button:hover {
-    background: #e68a00;
+.auth-container button:hover {
+    background: var(--btn-accent-hover);
     transform: scale(1.05);
     box-shadow: 0 6px 16px rgba(255, 165, 0, 0.7);
 }
 
 /* Separator */
-.separator {
+.auth-container .separator {
     margin: 15px 0;
     font-size: 16px;
     font-weight: 600;
 }
 
 /* Google Button */
-.google-btn {
+.auth-container .google-btn {
     background: white;
-    color: black;
+    color: var(--primary-text);
     font-size: 16px;
     font-weight: bold;
     padding: 14px;
@@ -175,34 +165,34 @@ button:hover {
     align-items: center;
     justify-content: center;
     transition: 0.3s ease;
-    box-shadow: 0 3px 12px rgba(0, 0, 0, 0.3);
+    box-shadow: 0 3px 12px rgba(0, 0, 0, 0.2);
 }
 
-.google-btn:hover {
+.auth-container .google-btn:hover {
     background: #f0f0f0;
     transform: scale(1.05);
-    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.4);
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.3);
 }
 
-/* Google Icon */
-.google-icon {
+.auth-container .google-icon {
     font-size: 18px;
     font-weight: bold;
     margin-right: 8px;
 }
 
-/* Switch between Login & Signup */
-.switch-auth {
+/* Switch Between Login/Signup */
+.auth-container .switch-auth {
     margin-top: 10px;
     font-size: 15px;
+    color: var(--primary-text);
 }
 
-.switch-auth a {
-    color: #ff9900;
+.auth-container .switch-auth a {
+    color: var(--btn-accent);
     font-weight: bold;
     text-decoration: none;
 }
 
-.switch-auth a:hover {
+.auth-container .switch-auth a:hover {
     text-decoration: underline;
 }

@@ -26,16 +26,11 @@ const LoginSignup = ({ type }) => {
   };
 
   const validatePassword = (password) => {
-    const minLength = password.length >= 8;
-    const uppercase = /[A-Z]/.test(password);
-    const number = /[0-9]/.test(password);
-    const specialChar = /[!@#$%^&*]/.test(password);
-    
     setPasswordValid({
-      minLength,
-      uppercase,
-      number,
-      specialChar,
+      minLength: password.length >= 8,
+      uppercase: /[A-Z]/.test(password),
+      number: /[0-9]/.test(password),
+      specialChar: /[!@#$%^&*]/.test(password),
     });
   };
 
@@ -49,88 +44,36 @@ const LoginSignup = ({ type }) => {
           <form>
             {type === "signup" && (
               <div className="input-container">
-                <input
-                  type="text"
-                  name="fullName"
-                  placeholder="Full Name"
-                  onChange={handleChange}
-                  value={formData.fullName}
-                  required
-                />
+                <input type="text" name="fullName" placeholder="Full Name" onChange={handleChange} value={formData.fullName} required />
               </div>
             )}
 
             <div className="input-container">
-              <input
-                type="email"
-                name="email"
-                placeholder="Email"
-                onChange={handleChange}
-                value={formData.email}
-                required
-              />
+              <input type="email" name="email" placeholder="Email" onChange={handleChange} value={formData.email} required />
             </div>
 
             <div className="input-container">
-              <input
-                type={showPassword ? "text" : "password"}
-                name="password"
-                placeholder="Password"
-                onChange={handleChange}
-                value={formData.password}
-                required
-              />
-              <span className="password-toggle" onClick={togglePasswordVisibility}>
-                {showPassword ? <FaEyeSlash /> : <FaEye />}
-              </span>
+              <input type={showPassword ? "text" : "password"} name="password" placeholder="Password" onChange={handleChange} value={formData.password} required />
+              <span className="password-toggle" onClick={togglePasswordVisibility}>{showPassword ? <FaEyeSlash /> : <FaEye />}</span>
             </div>
 
-            {/* Password Checklist */}
             {type === "signup" && formData.password && (
               <div className="password-checklist">
                 <ul>
-                  <li>
-                    <input type="checkbox" checked={passwordValid.minLength} disabled />
-                    Minimum 8 characters
-                  </li>
-                  <li>
-                    <input type="checkbox" checked={passwordValid.uppercase} disabled />
-                    At least 1 uppercase letter
-                  </li>
-                  <li>
-                    <input type="checkbox" checked={passwordValid.number} disabled />
-                    At least 1 number
-                  </li>
-                  <li>
-                    <input type="checkbox" checked={passwordValid.specialChar} disabled />
-                    At least 1 special character
-                  </li>
+                  {Object.entries(passwordValid).map(([key, valid]) => (
+                    <li key={key}><input type="checkbox" checked={valid} disabled /> {key.replace(/([A-Z])/g, ' $1')}</li>
+                  ))}
                 </ul>
               </div>
             )}
 
-            <button type="submit">
-              {type === "login" ? "Login" : "Sign Up"}
-            </button>
+            <button type="submit">{type === "login" ? "Login" : "Sign Up"}</button>
           </form>
 
           <div className="separator">or</div>
-          <button className="google-btn">
-            <span className="google-icon">G</span>
-            Continue with Google
-          </button>
+          <button className="google-btn"><span className="google-icon">G</span> Continue with Google</button>
 
-          <div className="switch-auth">
-            {type === "login" ? (
-              <>
-                Don't have an account? <a href="/signup">Sign Up</a>
-              </>
-            ) : (
-              <>
-                Already a user? <a href="/login">Login</a>
-              </>
-            )}
-          </div>
+          <div className="switch-auth">{type === "login" ? "Don't have an account? " : "Already a user? "} <a href={type === "login" ? "/signup" : "/login"}>{type === "login" ? "Sign Up" : "Login"}</a></div>
         </div>
       )}
     </div>
