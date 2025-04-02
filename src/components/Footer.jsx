@@ -1,5 +1,5 @@
-import { Github, Youtube, Twitter, Mail } from 'lucide-react';
-import '../style/Footer.css';
+import { Github, Youtube, Twitter, Mail } from "lucide-react";
+import "../style/Footer.css";
 
 const Footer = () => {
   const currentYear = new Date().getFullYear();
@@ -12,7 +12,7 @@ const Footer = () => {
           <div className="footer-section">
             <h3 className="footer-title">GauZen</h3>
             <p className="footer-description">
-            Empowering Cattle Farmers with AI-Driven Solutions!
+              Empowering Cattle Farmers with AI-Driven Solutions.
             </p>
             <div className="footer-icons">
               <a href="#" className="footer-icon"><Twitter size={20} /></a>
@@ -27,7 +27,7 @@ const Footer = () => {
             <ul className="footer-list">
               <li><a href="#" className="footer-link">CowPedia</a></li>
               <li><a href="#" className="footer-link">Breed Matching</a></li>
-              <li><a href="#" className="footer-link">MarketPlace</a></li>
+              <li><a href="#" className="footer-link">Marketplace</a></li>
               <li><a href="#" className="footer-link">Smart Vet Locator</a></li>
             </ul>
           </div>
@@ -51,9 +51,10 @@ const Footer = () => {
               <a href="mailto:gargshubham2411@gmail.com" className="footer-link">
                 support@gauzen.app
               </a>
-              
-              <a href ="https://youtu.be/r6zIGXun57U?si=lovBUerOq9lnRzs6" className="footer-link">Easter Egg</a>
             </div>
+            <a href="https://youtu.be/r6zIGXun57U?si=lovBUerOq9lnRzs6" className="footer-link">
+              Easter Egg
+            </a>
           </div>
         </div>
 

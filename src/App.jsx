@@ -8,6 +8,7 @@ import Footer from "./components/Footer";
 import Navbar from "./components/Navbar";
 import Marketplace from "./components/MarketPlace";
 import { useState } from "react";
+import ChatBot from "./components/Chatbot/ChatBot";
 
 function App() {
   const [isMarketplaceOpen, setMarketplaceOpen] = useState(false);
@@ -26,6 +27,7 @@ function App() {
           </Routes>
         </div>
         <Footer />
+        <ChatBot />
       </Router>
       <Marketplace
         isOpen={isMarketplaceOpen}
