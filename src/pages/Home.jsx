@@ -1,11 +1,13 @@
 import React from "react";
 import MTD from "../components/MTD.jsx";
-
+import Text from "../components/Text.jsx";
 
 const Home = () => {
   return (
-    
-    <MTD />
+    <div>
+      <Text />
+      <MTD />
+    </div>
   );
 };
 
