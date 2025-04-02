@@ -10,7 +10,7 @@ import Marketplace from "./components/MarketPlace";
 import { useState } from "react";
 import ChatBot from "./components/Chatbot/ChatBot";
 import VetDoc from "./pages/VetDoc";
-import "./app.css";
+import "./App.css";
 
 function App() {
   const [isMarketplaceOpen, setMarketplaceOpen] = useState(false);
