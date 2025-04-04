@@ -81,6 +81,22 @@ app.get("/api/vets", async (req, res) => {
     res.status(500).json({ error: "Internal Server Error" });
   }
 });
+app.get("/api/breed-compatibility", async (req, res) => {
+  const { breed } = req.query;
+  if (!breed) return res.status(400).json({ error: "Breed name required" });
+
+  try {
+    const doc = await db.collection("breed_compatibility").doc(breed).get();
+    if (!doc.exists) return res.status(404).json({ error: "Breed not found" });
+
+    res.json({ partners: doc.data().compatibleBreeds || [] }); // ✅ Access the correct field
+    console.log({ partners: doc.data().compatibleBreeds || [] });
+  } catch (error) {
+    console.error("🔥 Error fetching compatibility:", error);
+    res.status(500).json({ error: "Internal Server Error" });
+  }
+});
+
 
 // ✅ Start Server
 app.listen(PORT, () => {

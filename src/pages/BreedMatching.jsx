@@ -1,35 +1,16 @@
 import React, { useState, useEffect, useRef } from "react";
 import "../style/BreedMatching.css";
 
-const breedCompatibility = {
-  "Gir": [
-    { breed: "Sahiwal", benefits: ["Higher milk yield", "Disease resistance", "Good temperament"] },
-    { breed: "Tharparkar", benefits: ["Better adaptability to hot climates", "Improved fertility"] },
-    { breed: "Red Sindhi", benefits: ["Increased milk production", "Stronger immune system"] },
-  ],
-  "Sahiwal": [
-    { breed: "Gir", benefits: ["Better hybrid vigor", "Higher fat content in milk"] },
-    { breed: "Kankrej", benefits: ["Superior endurance", "Good for draught work"] },
-    { breed: "Hariana", benefits: ["Stronger calves", "High disease resistance"] },
-  ],
-  "Holstein": [
-    { breed: "Jersey", benefits: ["Higher butterfat percentage", "Adaptability"] },
-    { breed: "Brown Swiss", benefits: ["Improved milk quality", "More resilience"] },
-    { breed: "Normande", benefits: ["Increased protein content", "High fertility"] },
-  ],
-  "Jersey": [
-    { breed: "Holstein", benefits: ["High milk volume", "Better lifespan"] },
-    { breed: "Ayrshire", benefits: ["More robust calves", "Better heat resistance"] },
-    { breed: "Brown Swiss", benefits: ["Higher cheese yield", "Strong legs & hooves"] },
-  ],
-  "Rathi": [
-    { breed: "Gir", benefits: ["Strong disease resistance", "Long lactation period"] },
-    { breed: "Kankrej", benefits: ["Dual-purpose breed (milk & draught)", "High heat tolerance"] },
-    { breed: "Tharparkar", benefits: ["Resistant to common cattle diseases", "Good reproductive capacity"] },
-  ],
-};
-
-const breedList = Object.keys(breedCompatibility);
+const breedList = [
+  "Gir", "Sahiwal", "Holstein", "Jersey", "Rathi", "Tharparkar", "Red Sindhi", "Ongole", "Hallikar",
+  "Amrit Mahal", "Kankrej", "Hariana", "Montbéliarde", "Khillari", "Malnad Gidda", "Punganur", "Vechur",
+  "Kangayam", "Krishna Valley", "Belahi", "Deoni", "Nagori", "Mewati", "Gangatiri", "Ponwar", "Lal Kandhari",
+  "Siri", "Kherigarh", "Shahabadi", "Kalahandi", "Khariar", "Motu", "Binjharpuri", "Dangi", "Kasaragod",
+  "Ayrshire", "Brown Swiss", "Normande", "Simmental", "Fleckvieh", "Swedish Red", "Norwegian Red",
+  "Danish Red", "Belgian Blue", "Piedmontese", "Charolais", "Limousin", "Hereford", "Angus", "Shorthorn",
+  "Texas Longhorn", "Brahman", "Gelbvieh", "Dexter", "South Devon", "Wagyu", "Murray Grey", "Highland",
+  "Parthenais", "Ankole-Watusi", "Galloway"
+];
 
 const BreedMatching = () => {
   const [query, setQuery] = useState("");
@@ -43,30 +24,36 @@ const BreedMatching = () => {
     setQuery(input);
 
     if (input.length > 0) {
-      const filteredSuggestions = breedList
-        .filter(breed => breed.toLowerCase().includes(input.toLowerCase()))
+      const filtered = breedList
+        .filter(b => b.toLowerCase().includes(input.toLowerCase()))
         .slice(0, 6);
-      setSuggestions(filteredSuggestions);
+      setSuggestions(filtered);
     } else {
       setSuggestions([]);
       setMatchingBreeds([]);
     }
   };
-
-  const handleSelect = (breed) => {
+  const handleSelect = async (breed) => {
     setQuery(breed);
     setSuggestions([]);
     setLoading(true);
+    setMatchingBreeds([]);
 
-    setTimeout(() => {
-      setMatchingBreeds(breedCompatibility[breed] || []);
+    try {
+      const response = await fetch(`http://localhost:5000/api/breed-compatibility?breed=${breed}`);
+      const data = await response.json();
+      setMatchingBreeds(data.partners || []); // ✅ Fix here
+    } catch (error) {
+      console.error("Error fetching breed compatibility:", error);
+    } finally {
       setLoading(false);
-    }, 1500);
-  };
+    }
+};
+
 
   useEffect(() => {
-    const handleClickOutside = (event) => {
-      if (searchRef.current && !searchRef.current.contains(event.target)) {
+    const handleClickOutside = (e) => {
+      if (searchRef.current && !searchRef.current.contains(e.target)) {
         setSuggestions([]);
       }
     };
