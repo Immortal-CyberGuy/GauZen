@@ -2,6 +2,8 @@ import express from "express";
 import cors from "cors";
 import dotenv from "dotenv";
 import fetch from "node-fetch";
+import admin from "firebase-admin";
+import serviceAccount from "./serviceAccountKey.json" assert { type: "json" };
 
 dotenv.config();
 
@@ -10,26 +12,77 @@ const PORT = 5000;
 
 app.use(cors());
 
-app.get("/api/vets", async (req, res) => {
-  const { lat, lng } = req.query;
-  const apiKey = process.env.GOOGLE_MAPS_API_KEY;
+// ✅ Initialize Firebase Admin
+admin.initializeApp({
+  credential: admin.credential.cert(serviceAccount),
+});
+const db = admin.firestore();
 
-  if (!lat || !lng) {
-    return res.status(400).json({ error: "Latitude and Longitude required" });
-  }
-
-  const url = `https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=${lat},${lng}&radius=5000&type=veterinary_care&key=${apiKey}`;
+// ✅ Fetch Cow Breed Data
+app.get("/api/breed", async (req, res) => {
+  const { breedName } = req.query;
+  if (!breedName) return res.status(400).json({ error: "Breed name required" });
 
   try {
-    const response = await fetch(url);
-    const data = await response.json();
-    res.json(data);
+    const collections = ["cow_breed_general", "cow_breed_specific"];
+    const [generalDoc, specificDoc] = await Promise.all(
+      collections.map((col) => db.collection(col).doc(breedName).get())
+    );
+
+    const generalData = generalDoc.exists ? Object.values(generalDoc.data()) : [];
+    const specificData = specificDoc.exists
+      ? [specificDoc.data().g1, specificDoc.data().g2, specificDoc.data().g3, specificDoc.data().g4, specificDoc.data().g5]
+      : [];
+
+    res.json({ general: generalData, specific: specificData });
   } catch (error) {
-    console.error("Error fetching Google Places API:", error);
+    console.error("🔥 Error fetching breed data:", error);
     res.status(500).json({ error: "Internal Server Error" });
   }
 });
 
+// ✅ Fetch Nearby Vets (with phone numbers)
+app.get("/api/vets", async (req, res) => {
+  const { lat, lng } = req.query;
+  const apiKey = process.env.GOOGLE_MAPS_API_KEY;
+
+  if (!lat || !lng) return res.status(400).json({ error: "Latitude and Longitude required" });
+
+  const nearbyUrl = `https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=${lat},${lng}&radius=5000&type=veterinary_care&key=${apiKey}`;
+
+  try {
+    const response = await fetch(nearbyUrl);
+    const data = await response.json();
+
+    if (data.status !== "OK") {
+      console.error("🔥 Google API Error:", data);
+      return res.status(500).json({ error: "Failed to fetch vet data" });
+    }
+
+    const enrichedResults = await Promise.all(
+      data.results.map(async (place) => {
+        const placeId = place.place_id;
+        const detailUrl = `https://maps.googleapis.com/maps/api/place/details/json?place_id=${placeId}&fields=name,formatted_phone_number&key=${apiKey}`;
+        try {
+          const detailRes = await fetch(detailUrl);
+          const detailData = await detailRes.json();
+          const phone = detailData?.result?.formatted_phone_number || null;
+          return { ...place, formatted_phone_number: phone };
+        } catch (err) {
+          console.error("⚠️ Failed to fetch phone for:", place.name);
+          return { ...place, formatted_phone_number: null };
+        }
+      })
+    );
+
+    res.json({ results: enrichedResults });
+  } catch (error) {
+    console.error("🔥 Error fetching Google Places API:", error);
+    res.status(500).json({ error: "Internal Server Error" });
+  }
+});
+
+// ✅ Start Server
 app.listen(PORT, () => {
-  console.log(`Server running on http://localhost:${PORT}`);
+  console.log(`🚀 Server running on http://localhost:${PORT}`);
 });

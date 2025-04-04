@@ -174,3 +174,12 @@
         width: 90%;
     }
 }
+
+.phone-link {
+    color: #007bff;
+    text-decoration: none;
+  }
+  .phone-link:hover {
+    text-decoration: underline;
+  }
+  

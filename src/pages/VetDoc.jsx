@@ -10,7 +10,7 @@ const VetDoc = () => {
   const [vetDoctors, setVetDoctors] = useState([]);
   const [selectedVet, setSelectedVet] = useState(null);
   const [error, setError] = useState("");
-  const [sortType, setSortType] = useState("rating"); // Default sorting by rating
+  const [sortType, setSortType] = useState("rating");
 
   const { isLoaded, loadError } = useLoadScript({ googleMapsApiKey: import.meta.env.VITE_GOOGLE_MAPS_API_KEY });
 
@@ -27,29 +27,22 @@ const VetDoc = () => {
 
   const calculateDistance = (lat1, lon1, lat2, lon2) => {
     const toRad = (deg) => (deg * Math.PI) / 180;
-    const R = 6371; // Earth's radius in km
+    const R = 6371;
     const dLat = toRad(lat2 - lat1);
     const dLon = toRad(lon2 - lon1);
-    const a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+    const a = Math.sin(dLat / 2) ** 2 +
               Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) *
-              Math.sin(dLon / 2) * Math.sin(dLon / 2);
+              Math.sin(dLon / 2) ** 2;
     const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
     return R * c;
   };
 
   const fetchVetDoctors = async () => {
-    if (!location) {
-      setError("Location not available.");
-      return;
-    }
-
-    console.log("Fetching vets for:", location);
+    if (!location) return setError("Location not available.");
 
     try {
       const response = await fetch(`http://localhost:5000/api/vets?lat=${location.lat}&lng=${location.lng}`);
       const data = await response.json();
-      console.log("API Response:", data);
-
       if (data.results) {
         setVetDoctors(data.results);
       } else {
@@ -79,11 +72,7 @@ const VetDoc = () => {
     <div className="vet-container">
       <h2>Smart Vet Locator</h2>
       <button className="fetch-button" onClick={fetchVetDoctors}>Find Nearby Vets</button>
-
       {error && <p className="error">{error}</p>}
-
-      {/* Sorting Options */}
-     
 
       <div className="map-container">
         <GoogleMap mapContainerStyle={mapContainerStyle} zoom={12} center={location || defaultCenter}>
@@ -101,29 +90,37 @@ const VetDoc = () => {
                 <h3>{selectedVet.name}</h3>
                 <p>{selectedVet.vicinity}</p>
                 <p><strong>Rating:</strong> {selectedVet.rating || "N/A"}</p>
-                <a href={`https://www.google.com/maps/search/?api=1&query=${selectedVet.geometry.location.lat},${selectedVet.geometry.location.lng}`} target="_blank" rel="noopener noreferrer">
-                  View on Map
-                </a>
+                {selectedVet.formatted_phone_number && (
+                  <p><strong>Phone:</strong> <a href={`tel:${selectedVet.formatted_phone_number}`}>{selectedVet.formatted_phone_number}</a></p>
+                )}
               </div>
             </InfoWindow>
           )}
         </GoogleMap>
       </div>
+
       <div className="sort-container">
-  <span className="sort-title">Sort By:</span>
-  <button className="sort-button" onClick={() => setSortType("rating")}>⭐ Rating</button>
-  <button className="sort-button" onClick={() => setSortType("distance")}>📍 Distance</button>
-</div>
+        <span className="sort-title">Sort By:</span>
+        <button className="sort-button" onClick={() => setSortType("rating")}>⭐ Rating</button>
+        <button className="sort-button" onClick={() => setSortType("distance")}>📍 Distance</button>
+      </div>
 
-
-      {/* Professional Vet List */}
       <div className="vet-list">
         {sortedVets.map((vet, index) => (
           <div key={index} className="vet-card">
             <h3 className="vet-name">{vet.name}</h3>
             <p className="vet-info"><strong>📍 Address:</strong> {vet.vicinity}</p>
             <p className="vet-info"><strong>⭐ Rating:</strong> {vet.rating || "N/A"}</p>
-            <p className="vet-info"><strong>📞 Phone:</strong> {vet.formatted_phone_number || "Not Available"}</p>
+            <p className="vet-info">
+              <strong>📞 Phone:</strong>{" "}
+              {vet.formatted_phone_number ? (
+                <a href={`tel:${vet.formatted_phone_number}`} className="phone-link">
+                  {vet.formatted_phone_number}
+                </a>
+              ) : (
+                "Not Available"
+              )}
+            </p>
             <a className="vet-link" href={`https://www.google.com/maps/search/?api=1&query=${vet.geometry.location.lat},${vet.geometry.location.lng}`} target="_blank" rel="noopener noreferrer">
               🔗 View on Google Maps
             </a>
