@@ -53,23 +53,26 @@ export const fetchGeminiResponse = async (chatHistory) => {
       body: JSON.stringify(requestBody),
     });
 
-    console.log("Response Status:", response.status);
-
     if (!response.ok) {
       const errorData = await response.json();
       console.error("❌ API Error:", errorData);
-      return `❌ API Error: ${errorData.error.message}`;
+      
+      // Handle rate limit error specifically
+      if (response.status === 429) {
+        return "I'm currently experiencing high demand and have reached my limit. Please try again in a few minutes.";
+      }
+      
+      return `Sorry, I'm having trouble processing your request. Please try again later.`;
     }
 
     const data = await response.json();
-    console.log("API Response:", JSON.stringify(data, null, 2));
-
+    
     return (
       data?.candidates?.[0]?.content?.parts?.[0]?.text ||
       "⚠️ No valid response received."
     );
   } catch (error) {
     console.error("Fetch Error:", error);
-    return "❌ Error: Unable to connect to GauZen's Assistant.";
+    return "❌ Error: Unable to connect to GauZen's Assistant. Please try again later.";
   }
 };

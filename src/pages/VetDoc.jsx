@@ -4,6 +4,7 @@ import "../style/VetDoc.css";
 
 const mapContainerStyle = { width: "100%", height: "500px" };
 const defaultCenter = { lat: 20.5937, lng: 78.9629 };
+const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || 'http://localhost:5000';
 
 const VetDoc = () => {
   const [location, setLocation] = useState(null);
@@ -11,6 +12,7 @@ const VetDoc = () => {
   const [selectedVet, setSelectedVet] = useState(null);
   const [error, setError] = useState("");
   const [sortType, setSortType] = useState("rating");
+  const [isLoading, setIsLoading] = useState(false);
 
   const { isLoaded, loadError } = useLoadScript({ googleMapsApiKey: import.meta.env.VITE_GOOGLE_MAPS_API_KEY });
 
@@ -39,18 +41,35 @@ const VetDoc = () => {
 
   const fetchVetDoctors = async () => {
     if (!location) return setError("Location not available.");
+    
+    setIsLoading(true);
+    setError("");
 
     try {
-      const response = await fetch(`http://localhost:5000/api/vets?lat=${location.lat}&lng=${location.lng}`);
+      const response = await fetch(`${BACKEND_URL}/api/vets?lat=${location.lat}&lng=${location.lng}`, {
+        method: 'GET',
+        headers: {
+          'Accept': 'application/json',
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
       const data = await response.json();
       if (data.results) {
         setVetDoctors(data.results);
       } else {
-        setError(`API Error: ${data.status}`);
+        throw new Error(data.status || 'Failed to fetch vet data');
       }
     } catch (err) {
-      setError("Error fetching data. Check backend.");
       console.error("Fetch error:", err);
+      setError(
+        "Unable to fetch vet data. Please ensure the backend server is running and try again."
+      );
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -71,7 +90,13 @@ const VetDoc = () => {
   return (
     <div className="vet-container">
       <h2>Smart Vet Locator</h2>
-      <button className="fetch-button" onClick={fetchVetDoctors}>Find Nearby Vets</button>
+      <button 
+        className="fetch-button" 
+        onClick={fetchVetDoctors}
+        disabled={isLoading}
+      >
+        {isLoading ? "Loading..." : "Find Nearby Vets"}
+      </button>
       {error && <p className="error">{error}</p>}
 
       <div className="map-container">
