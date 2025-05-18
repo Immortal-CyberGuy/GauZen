@@ -5,8 +5,10 @@ import admin from 'firebase-admin';
 import fetch from 'node-fetch';
 import { Buffer } from 'buffer';
 
+// Load environment variables
 dotenv.config();
 
+// Decode and initialize Firebase Admin SDK
 if (!process.env.FIREBASE_SERVICE_ACCOUNT_B64) {
   console.error('🔥 FIREBASE_SERVICE_ACCOUNT_B64 is not set');
   process.exit(1);
@@ -27,8 +29,9 @@ admin.initializeApp({
 const db = admin.firestore();
 
 const app = express();
-const PORT = process.env.PORT || 10000;
+const PORT = process.env.PORT || 3000;
 
+// CSP Middleware
 app.use((req, res, next) => {
   res.setHeader(
     'Content-Security-Policy',
@@ -37,31 +40,12 @@ app.use((req, res, next) => {
   next();
 });
 
+// Middleware
 app.use(cors());
 app.use(express.json());
 
-// Firebase Authentication middleware
-async function verifyFirebaseToken(req, res, next) {
-  const authHeader = req.headers.authorization;
-
-  if (!authHeader || !authHeader.startsWith('Bearer ')) {
-    return res.status(401).json({ error: 'Unauthorized: No token provided' });
-  }
-
-  const idToken = authHeader.split(' ')[1];
-
-  try {
-    const decodedToken = await admin.auth().verifyIdToken(idToken);
-    req.user = decodedToken; // you can use this later if needed
-    next();
-  } catch (error) {
-    console.error('🔥 Firebase token verification failed:', error);
-    res.status(401).json({ error: 'Unauthorized: Invalid token' });
-  }
-}
-
-// Protected endpoint: Get nearby veterinary clinics
-app.get('/api/vets', verifyFirebaseToken, async (req, res) => {
+// Endpoint: Get nearby veterinary clinics
+app.get('/api/vets', async (req, res) => {
   const { lat, lng } = req.query;
   const apiKey = process.env.GOOGLE_MAPS_API_KEY;
 
@@ -76,19 +60,26 @@ app.get('/api/vets', verifyFirebaseToken, async (req, res) => {
   try {
     const response = await fetch(nearbyUrl);
     const data = await response.json();
-    if (data.status !== 'OK') {
+
+    if (!['OK', 'ZERO_RESULTS'].includes(data.status)) {
       console.error('🔥 Google API Error:', data);
       return res.status(500).json({ error: 'Failed to fetch vet data' });
     }
 
     const enrichedResults = await Promise.all(
       data.results.map(async (place) => {
+        if (!place.place_id) return place;
+
         const detailUrl = `https://maps.googleapis.com/maps/api/place/details/json?place_id=${place.place_id}&fields=name,formatted_phone_number&key=${apiKey}`;
         try {
           const detailRes = await fetch(detailUrl);
           const detailData = await detailRes.json();
-          return { ...place, formatted_phone_number: detailData.result?.formatted_phone_number || null };
-        } catch {
+          return {
+            ...place,
+            formatted_phone_number: detailData.result?.formatted_phone_number || null
+          };
+        } catch (e) {
+          console.warn('⚠️ Detail fetch failed:', e);
           return { ...place, formatted_phone_number: null };
         }
       })
@@ -101,7 +92,7 @@ app.get('/api/vets', verifyFirebaseToken, async (req, res) => {
   }
 });
 
-// Protected endpoint: Get breed compatibility
+// Endpoint: Get breed compatibility
 app.get('/api/breed-compatibility', verifyFirebaseToken, async (req, res) => {
   const { breed } = req.query;
   if (!breed) {
@@ -113,7 +104,31 @@ app.get('/api/breed-compatibility', verifyFirebaseToken, async (req, res) => {
     if (!doc.exists) {
       return res.status(404).json({ error: 'Breed not found' });
     }
-    res.json({ partners: doc.data().compatibleBreeds || [] });
+    const data = doc.data();
+    // Expect data.compatibleBreeds as array of partner breed names
+    // and optional data.benefits as a map: { [partner]: ['reason1', 'reason2'] }
+    const partners = (data.compatibleBreeds || []).map((partner) => ({
+      breed: partner,
+      benefits: Array.isArray(data.benefits?.[partner])
+        ? data.benefits[partner]
+        : []
+    }));
+    res.json({ partners });
+  } catch (error) {
+    console.error('🔥 Error fetching compatibility:', error);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+});
+  }
+
+  try {
+    const doc = await db.collection('breed_compatibility').doc(breed).get();
+    if (!doc.exists) {
+      return res.status(404).json({ error: 'Breed not found' });
+    }
+
+    const data = doc.data();
+    res.json({ partners: data?.compatibleBreeds || [] });
   } catch (error) {
     console.error('🔥 Error fetching compatibility:', error);
     res.status(500).json({ error: 'Internal Server Error' });
