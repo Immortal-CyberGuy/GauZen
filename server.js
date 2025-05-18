@@ -3,22 +3,22 @@ import cors from "cors";
 import dotenv from "dotenv";
 import fetch from "node-fetch";
 import admin from "firebase-admin";
-import serviceAccount from "./serviceAccountKey.json" assert { type: "json" };
+import fs from "fs";
 
 dotenv.config();
 
 const app = express();
-const PORT = 5000;
+const PORT = process.env.PORT || 5000;
 
 app.use(cors());
 
-// ✅ Initialize Firebase Admin
+const serviceAccount = JSON.parse(fs.readFileSync("./serviceAccountKey.json"));
+
 admin.initializeApp({
   credential: admin.credential.cert(serviceAccount),
 });
 const db = admin.firestore();
 
-// ✅ Fetch Cow Breed Data
 app.get("/api/breed", async (req, res) => {
   const { breedName } = req.query;
   if (!breedName) return res.status(400).json({ error: "Breed name required" });
@@ -41,7 +41,6 @@ app.get("/api/breed", async (req, res) => {
   }
 });
 
-// ✅ Fetch Nearby Vets (with phone numbers)
 app.get("/api/vets", async (req, res) => {
   const { lat, lng } = req.query;
   const apiKey = process.env.GOOGLE_MAPS_API_KEY;
@@ -81,6 +80,7 @@ app.get("/api/vets", async (req, res) => {
     res.status(500).json({ error: "Internal Server Error" });
   }
 });
+
 app.get("/api/breed-compatibility", async (req, res) => {
   const { breed } = req.query;
   if (!breed) return res.status(400).json({ error: "Breed name required" });
@@ -89,7 +89,7 @@ app.get("/api/breed-compatibility", async (req, res) => {
     const doc = await db.collection("breed_compatibility").doc(breed).get();
     if (!doc.exists) return res.status(404).json({ error: "Breed not found" });
 
-    res.json({ partners: doc.data().compatibleBreeds || [] }); // ✅ Access the correct field
+    res.json({ partners: doc.data().compatibleBreeds || [] });
     console.log({ partners: doc.data().compatibleBreeds || [] });
   } catch (error) {
     console.error("🔥 Error fetching compatibility:", error);
@@ -97,8 +97,7 @@ app.get("/api/breed-compatibility", async (req, res) => {
   }
 });
 
-
-// ✅ Start Server
+// Start server
 app.listen(PORT, () => {
   console.log(`🚀 Server running on http://localhost:${PORT}`);
 });
