@@ -3,7 +3,6 @@ import cors from "cors";
 import dotenv from "dotenv";
 import fetch from "node-fetch";
 import admin from "firebase-admin";
-import fs from "fs";
 import path from "path";
 
 dotenv.config();
@@ -13,11 +12,17 @@ const PORT = process.env.PORT || 5000;
 
 app.use(cors());
 
-const serviceAccount = JSON.parse(fs.readFileSync("./serviceAccountKey.json"));
+if (!process.env.FIREBASE_SERVICE_ACCOUNT) {
+  console.error("❌ FIREBASE_SERVICE_ACCOUNT env var is missing!");
+  process.exit(1);
+}
+
+const serviceAccount = JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT);
 
 admin.initializeApp({
   credential: admin.credential.cert(serviceAccount),
 });
+
 const db = admin.firestore();
 
 app.use((req, res, next) => {
@@ -48,7 +53,13 @@ app.get("/api/breed", async (req, res) => {
 
     const generalData = generalDoc.exists ? Object.values(generalDoc.data()) : [];
     const specificData = specificDoc.exists
-      ? [specificDoc.data().g1, specificDoc.data().g2, specificDoc.data().g3, specificDoc.data().g4, specificDoc.data().g5]
+      ? [
+          specificDoc.data().g1,
+          specificDoc.data().g2,
+          specificDoc.data().g3,
+          specificDoc.data().g4,
+          specificDoc.data().g5,
+        ]
       : [];
 
     res.json({ general: generalData, specific: specificData });
@@ -63,6 +74,7 @@ app.get("/api/vets", async (req, res) => {
   const apiKey = process.env.GOOGLE_MAPS_API_KEY;
 
   if (!lat || !lng) return res.status(400).json({ error: "Latitude and Longitude required" });
+  if (!apiKey) return res.status(500).json({ error: "Google Maps API Key not configured" });
 
   const nearbyUrl = `https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=${lat},${lng}&radius=5000&type=veterinary_care&key=${apiKey}`;
 
@@ -84,7 +96,7 @@ app.get("/api/vets", async (req, res) => {
           const detailData = await detailRes.json();
           const phone = detailData?.result?.formatted_phone_number || null;
           return { ...place, formatted_phone_number: phone };
-        } catch (err) {
+        } catch {
           console.error("⚠️ Failed to fetch phone for:", place.name);
           return { ...place, formatted_phone_number: null };
         }
@@ -113,12 +125,10 @@ app.get("/api/breed-compatibility", async (req, res) => {
   }
 });
 
-// CATCH ALL - fallback for SPA routes, must be last rout
-app.get("*", (req, res) => {
+app.get("/*", (req, res) => {
   res.sendFile(path.resolve("./dist/index.html"));
 });
 
-// Global error handler (optional but recommended)
 app.use((err, req, res, next) => {
   console.error("🚨 Uncaught error:", err);
   res.status(500).json({ error: "Something went wrong" });
