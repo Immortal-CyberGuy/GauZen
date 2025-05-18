@@ -23,8 +23,14 @@ dist-ssr
 *.sln
 *.sw?
 
-# .env
-# *.env
-# serviceAccountKey.json
-# *.json
+# Environment Variables
+.env
+.env.local
+.env.*.local
+
+# Firebase Admin SDK
+serviceAccountKey.json
+
+# Firebase Client Config (if you extract it)
+src/firebaseConfig.js
 
