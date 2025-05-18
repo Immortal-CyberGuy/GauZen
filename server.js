@@ -105,8 +105,6 @@ app.get('/api/breed-compatibility', verifyFirebaseToken, async (req, res) => {
       return res.status(404).json({ error: 'Breed not found' });
     }
     const data = doc.data();
-    // Expect data.compatibleBreeds as array of partner breed names
-    // and optional data.benefits as a map: { [partner]: ['reason1', 'reason2'] }
     const partners = (data.compatibleBreeds || []).map((partner) => ({
       breed: partner,
       benefits: Array.isArray(data.benefits?.[partner])
@@ -114,21 +112,6 @@ app.get('/api/breed-compatibility', verifyFirebaseToken, async (req, res) => {
         : []
     }));
     res.json({ partners });
-  } catch (error) {
-    console.error('🔥 Error fetching compatibility:', error);
-    res.status(500).json({ error: 'Internal Server Error' });
-  }
-});
-  }
-
-  try {
-    const doc = await db.collection('breed_compatibility').doc(breed).get();
-    if (!doc.exists) {
-      return res.status(404).json({ error: 'Breed not found' });
-    }
-
-    const data = doc.data();
-    res.json({ partners: data?.compatibleBreeds || [] });
   } catch (error) {
     console.error('🔥 Error fetching compatibility:', error);
     res.status(500).json({ error: 'Internal Server Error' });
