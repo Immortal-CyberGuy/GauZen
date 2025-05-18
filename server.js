@@ -113,8 +113,15 @@ app.get("/api/breed-compatibility", async (req, res) => {
   }
 });
 
-app.get("/*", (req, res) => {
+// CATCH ALL - fallback for SPA routes, must be last rout
+app.get("*", (req, res) => {
   res.sendFile(path.resolve("./dist/index.html"));
+});
+
+// Global error handler (optional but recommended)
+app.use((err, req, res, next) => {
+  console.error("🚨 Uncaught error:", err);
+  res.status(500).json({ error: "Something went wrong" });
 });
 
 app.listen(PORT, () => {
