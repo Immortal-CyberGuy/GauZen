@@ -43,7 +43,7 @@ const BreedMatching = () => {
     setError("");
 
     try {
-      const response = await fetch(`http://localhost:5000/api/breed-compatibility?breed=${breed}`);
+      const response = await fetch(`http://localhost:10000/api/breed-compatibility?breed=${breed}`);
       const data = await response.json();
       
       if (data.error) {
