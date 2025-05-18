@@ -4,6 +4,7 @@ import dotenv from "dotenv";
 import fetch from "node-fetch";
 import admin from "firebase-admin";
 import fs from "fs";
+import path from "path";
 
 dotenv.config();
 
@@ -19,6 +20,25 @@ admin.initializeApp({
 });
 const db = admin.firestore();
 
+// Add Content Security Policy header middleware
+app.use((req, res, next) => {
+  res.setHeader(
+    "Content-Security-Policy",
+    "default-src 'self'; " +
+      "script-src 'self' 'unsafe-inline' https://apis.google.com; " +
+      "style-src 'self' 'unsafe-inline'; " +
+      "font-src 'self' data:; " +
+      "img-src 'self' data: https:; " +
+      "connect-src 'self' https://*.googleapis.com; " +
+      "frame-src 'self';"
+  );
+  next();
+});
+
+// Serve static files from dist (your Vite build output)
+app.use(express.static(path.resolve("./dist")));
+
+// Your existing API routes
 app.get("/api/breed", async (req, res) => {
   const { breedName } = req.query;
   if (!breedName) return res.status(400).json({ error: "Breed name required" });
@@ -95,6 +115,11 @@ app.get("/api/breed-compatibility", async (req, res) => {
     console.error("🔥 Error fetching compatibility:", error);
     res.status(500).json({ error: "Internal Server Error" });
   }
+});
+
+// Catch-all handler to serve index.html for SPA routes
+app.get("*", (req, res) => {
+  res.sendFile(path.resolve("./dist/index.html"));
 });
 
 // Start server
