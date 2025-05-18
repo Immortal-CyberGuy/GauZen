@@ -32,26 +32,12 @@ const PORT = process.env.PORT || 10000;
 app.use(cors());
 app.use(express.json());
 
-// CSP Middleware (optional, but keep it if you want)
-app.use((req, res, next) => {
-  res.setHeader(
-    'Content-Security-Policy',
-    "default-src 'self'; font-src 'self' data: https:; script-src 'self' https:; style-src 'self' 'unsafe-inline' https:; img-src 'self' data: https:;"
-  );
-  next();
-});
-
-// Endpoint: Get nearby veterinary clinics
 app.get('/api/vets', async (req, res) => {
   const { lat, lng } = req.query;
   const apiKey = process.env.GOOGLE_MAPS_API_KEY;
 
-  if (!lat || !lng) {
-    return res.status(400).json({ error: 'Latitude and Longitude required' });
-  }
-  if (!apiKey) {
-    return res.status(500).json({ error: 'Google Maps API Key not configured' });
-  }
+  if (!lat || !lng) return res.status(400).json({ error: 'Latitude and Longitude required' });
+  if (!apiKey) return res.status(500).json({ error: 'Google Maps API Key not configured' });
 
   const nearbyUrl = `https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=${lat},${lng}&radius=5000&type=veterinary_care&key=${apiKey}`;
   try {
@@ -89,18 +75,13 @@ app.get('/api/vets', async (req, res) => {
   }
 });
 
-// Endpoint: Get breed compatibility
 app.get('/api/breed-compatibility', async (req, res) => {
   const { breed } = req.query;
-  if (!breed) {
-    return res.status(400).json({ error: 'Breed name required' });
-  }
+  if (!breed) return res.status(400).json({ error: 'Breed name required' });
 
   try {
     const doc = await db.collection('breed_compatibility').doc(breed).get();
-    if (!doc.exists) {
-      return res.status(404).json({ error: 'Breed not found' });
-    }
+    if (!doc.exists) return res.status(404).json({ error: 'Breed not found' });
 
     const data = doc.data();
     const partners = (data.compatibleBreeds || []).map((partner) => ({
