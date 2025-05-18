@@ -5,10 +5,8 @@ import admin from 'firebase-admin';
 import fetch from 'node-fetch';
 import { Buffer } from 'buffer';
 
-// Load environment variables
 dotenv.config();
 
-// Decode and initialize Firebase Admin SDK
 if (!process.env.FIREBASE_SERVICE_ACCOUNT_B64) {
   console.error('🔥 FIREBASE_SERVICE_ACCOUNT_B64 is not set');
   process.exit(1);
@@ -31,7 +29,6 @@ const db = admin.firestore();
 const app = express();
 const PORT = process.env.PORT || 10000;
 
-// CSP Middleware
 app.use((req, res, next) => {
   res.setHeader(
     'Content-Security-Policy',
@@ -40,12 +37,31 @@ app.use((req, res, next) => {
   next();
 });
 
-// Middleware
 app.use(cors());
 app.use(express.json());
 
-// Endpoint: Get nearby veterinary clinics
-app.get('/api/vets', async (req, res) => {
+// Firebase Authentication middleware
+async function verifyFirebaseToken(req, res, next) {
+  const authHeader = req.headers.authorization;
+
+  if (!authHeader || !authHeader.startsWith('Bearer ')) {
+    return res.status(401).json({ error: 'Unauthorized: No token provided' });
+  }
+
+  const idToken = authHeader.split(' ')[1];
+
+  try {
+    const decodedToken = await admin.auth().verifyIdToken(idToken);
+    req.user = decodedToken; // you can use this later if needed
+    next();
+  } catch (error) {
+    console.error('🔥 Firebase token verification failed:', error);
+    res.status(401).json({ error: 'Unauthorized: Invalid token' });
+  }
+}
+
+// Protected endpoint: Get nearby veterinary clinics
+app.get('/api/vets', verifyFirebaseToken, async (req, res) => {
   const { lat, lng } = req.query;
   const apiKey = process.env.GOOGLE_MAPS_API_KEY;
 
@@ -85,8 +101,8 @@ app.get('/api/vets', async (req, res) => {
   }
 });
 
-// Endpoint: Get breed compatibility
-app.get('/api/breed-compatibility', async (req, res) => {
+// Protected endpoint: Get breed compatibility
+app.get('/api/breed-compatibility', verifyFirebaseToken, async (req, res) => {
   const { breed } = req.query;
   if (!breed) {
     return res.status(400).json({ error: 'Breed name required' });
