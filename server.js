@@ -7,6 +7,9 @@ import { Buffer } from 'buffer';
 
 dotenv.config();
 
+// ——————————————————————————————
+// 1) FIREBASE SETUP
+// ——————————————————————————————
 if (!process.env.FIREBASE_SERVICE_ACCOUNT_B64) {
   console.error('🔥 FIREBASE_SERVICE_ACCOUNT_B64 is not set');
   process.exit(1);
@@ -26,18 +29,40 @@ admin.initializeApp({
 });
 const db = admin.firestore();
 
+// ——————————————————————————————
+// 2) EXPRESS SETUP
+// ——————————————————————————————
 const app = express();
 const PORT = process.env.PORT || 10000;
 
+// Enable CORS for all origins
 app.use(cors());
 app.use(express.json());
 
+// Simple request logger
+app.use((req, res, next) => {
+  console.log(`➡️  [${new Date().toISOString()}] ${req.method} ${req.url}`);
+  next();
+});
+
+// Health check
+app.get('/', (req, res) => {
+  res.send('✅ Server is up and running');
+});
+
+// ——————————————————————————————
+// 3) /api/vets
+// ——————————————————————————————
 app.get('/api/vets', async (req, res) => {
   const { lat, lng } = req.query;
   const apiKey = process.env.GOOGLE_MAPS_API_KEY;
 
-  if (!lat || !lng) return res.status(400).json({ error: 'Latitude and Longitude required' });
-  if (!apiKey) return res.status(500).json({ error: 'Google Maps API Key not configured' });
+  if (!lat || !lng) {
+    return res.status(400).json({ error: 'Latitude and Longitude required' });
+  }
+  if (!apiKey) {
+    return res.status(500).json({ error: 'Google Maps API Key not configured' });
+  }
 
   const nearbyUrl = `https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=${lat},${lng}&radius=5000&type=veterinary_care&key=${apiKey}`;
   try {
@@ -52,7 +77,6 @@ app.get('/api/vets', async (req, res) => {
     const enrichedResults = await Promise.all(
       data.results.map(async (place) => {
         if (!place.place_id) return place;
-
         const detailUrl = `https://maps.googleapis.com/maps/api/place/details/json?place_id=${place.place_id}&fields=name,formatted_phone_number&key=${apiKey}`;
         try {
           const detailRes = await fetch(detailUrl);
@@ -75,13 +99,20 @@ app.get('/api/vets', async (req, res) => {
   }
 });
 
+// ——————————————————————————————
+// 4) /api/breed-compatibility
+// ——————————————————————————————
 app.get('/api/breed-compatibility', async (req, res) => {
   const { breed } = req.query;
-  if (!breed) return res.status(400).json({ error: 'Breed name required' });
+  if (!breed) {
+    return res.status(400).json({ error: 'Breed name required' });
+  }
 
   try {
     const doc = await db.collection('breed_compatibility').doc(breed).get();
-    if (!doc.exists) return res.status(404).json({ error: 'Breed not found' });
+    if (!doc.exists) {
+      return res.status(404).json({ error: 'Breed not found' });
+    }
 
     const data = doc.data();
     const partners = (data.compatibleBreeds || []).map((partner) => ({
@@ -96,6 +127,9 @@ app.get('/api/breed-compatibility', async (req, res) => {
   }
 });
 
+// ——————————————————————————————
+// 5) START
+// ——————————————————————————————
 app.listen(PORT, () => {
   console.log(`🚀 Server is running on port ${PORT}`);
-}); 
+});
