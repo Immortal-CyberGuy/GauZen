@@ -4,7 +4,7 @@ import "../style/VetDoc.css";
 
 const mapContainerStyle = { width: "100%", height: "500px" };
 const defaultCenter = { lat: 20.5937, lng: 78.9629 };
-const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || 'http://localhost:5000';
+const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || "https://gauzen.onrender.com";
 
 const VetDoc = () => {
   const [location, setLocation] = useState(null);
@@ -14,7 +14,9 @@ const VetDoc = () => {
   const [sortType, setSortType] = useState("rating");
   const [isLoading, setIsLoading] = useState(false);
 
-  const { isLoaded, loadError } = useLoadScript({ googleMapsApiKey: import.meta.env.VITE_GOOGLE_MAPS_API_KEY });
+  const { isLoaded, loadError } = useLoadScript({
+    googleMapsApiKey: import.meta.env.VITE_GOOGLE_MAPS_API_KEY,
+  });
 
   useEffect(() => {
     if (navigator.geolocation) {
@@ -32,26 +34,29 @@ const VetDoc = () => {
     const R = 6371;
     const dLat = toRad(lat2 - lat1);
     const dLon = toRad(lon2 - lon1);
-    const a = Math.sin(dLat / 2) ** 2 +
-              Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) *
-              Math.sin(dLon / 2) ** 2;
+    const a =
+      Math.sin(dLat / 2) ** 2 +
+      Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) * Math.sin(dLon / 2) ** 2;
     const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
     return R * c;
   };
 
   const fetchVetDoctors = async () => {
     if (!location) return setError("Location not available.");
-    
+
     setIsLoading(true);
     setError("");
 
     try {
-      const response = await fetch(`${BACKEND_URL}/api/vets?lat=${location.lat}&lng=${location.lng}`, {
-        method: 'GET',
-        headers: {
-          'Accept': 'application/json',
-        },
-      });
+      const response = await fetch(
+        `${BACKEND_URL}/api/vets?lat=${location.lat}&lng=${location.lng}`,
+        {
+          method: "GET",
+          headers: {
+            Accept: "application/json",
+          },
+        }
+      );
 
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
@@ -61,7 +66,7 @@ const VetDoc = () => {
       if (data.results) {
         setVetDoctors(data.results);
       } else {
-        throw new Error(data.status || 'Failed to fetch vet data');
+        throw new Error(data.status || "Failed to fetch vet data");
       }
     } catch (err) {
       console.error("Fetch error:", err);
@@ -77,8 +82,18 @@ const VetDoc = () => {
     if (sortType === "rating") {
       return (b.rating || 0) - (a.rating || 0);
     } else if (sortType === "distance" && location) {
-      const distA = calculateDistance(location.lat, location.lng, a.geometry.location.lat, a.geometry.location.lng);
-      const distB = calculateDistance(location.lat, location.lng, b.geometry.location.lat, b.geometry.location.lng);
+      const distA = calculateDistance(
+        location.lat,
+        location.lng,
+        a.geometry.location.lat,
+        a.geometry.location.lng
+      );
+      const distB = calculateDistance(
+        location.lat,
+        location.lng,
+        b.geometry.location.lat,
+        b.geometry.location.lng
+      );
       return distA - distB;
     }
     return 0;
@@ -90,11 +105,7 @@ const VetDoc = () => {
   return (
     <div className="vet-container">
       <h2>Smart Vet Locator</h2>
-      <button 
-        className="fetch-button" 
-        onClick={fetchVetDoctors}
-        disabled={isLoading}
-      >
+      <button className="fetch-button" onClick={fetchVetDoctors} disabled={isLoading}>
         {isLoading ? "Loading..." : "Find Nearby Vets"}
       </button>
       {error && <p className="error">{error}</p>}
@@ -110,13 +121,21 @@ const VetDoc = () => {
             />
           ))}
           {selectedVet && (
-            <InfoWindow position={{ lat: selectedVet.geometry.location.lat, lng: selectedVet.geometry.location.lng }} onCloseClick={() => setSelectedVet(null)}>
+            <InfoWindow
+              position={{ lat: selectedVet.geometry.location.lat, lng: selectedVet.geometry.location.lng }}
+              onCloseClick={() => setSelectedVet(null)}
+            >
               <div>
                 <h3>{selectedVet.name}</h3>
                 <p>{selectedVet.vicinity}</p>
-                <p><strong>Rating:</strong> {selectedVet.rating || "N/A"}</p>
+                <p>
+                  <strong>Rating:</strong> {selectedVet.rating || "N/A"}
+                </p>
                 {selectedVet.formatted_phone_number && (
-                  <p><strong>Phone:</strong> <a href={`tel:${selectedVet.formatted_phone_number}`}>{selectedVet.formatted_phone_number}</a></p>
+                  <p>
+                    <strong>Phone:</strong>{" "}
+                    <a href={`tel:${selectedVet.formatted_phone_number}`}>{selectedVet.formatted_phone_number}</a>
+                  </p>
                 )}
               </div>
             </InfoWindow>
@@ -126,16 +145,24 @@ const VetDoc = () => {
 
       <div className="sort-container">
         <span className="sort-title">Sort By:</span>
-        <button className="sort-button" onClick={() => setSortType("rating")}>⭐ Rating</button>
-        <button className="sort-button" onClick={() => setSortType("distance")}>📍 Distance</button>
+        <button className="sort-button" onClick={() => setSortType("rating")}>
+          ⭐ Rating
+        </button>
+        <button className="sort-button" onClick={() => setSortType("distance")}>
+          📍 Distance
+        </button>
       </div>
 
       <div className="vet-list">
         {sortedVets.map((vet, index) => (
           <div key={index} className="vet-card">
             <h3 className="vet-name">{vet.name}</h3>
-            <p className="vet-info"><strong>📍 Address:</strong> {vet.vicinity}</p>
-            <p className="vet-info"><strong>⭐ Rating:</strong> {vet.rating || "N/A"}</p>
+            <p className="vet-info">
+              <strong>📍 Address:</strong> {vet.vicinity}
+            </p>
+            <p className="vet-info">
+              <strong>⭐ Rating:</strong> {vet.rating || "N/A"}
+            </p>
             <p className="vet-info">
               <strong>📞 Phone:</strong>{" "}
               {vet.formatted_phone_number ? (
@@ -146,7 +173,12 @@ const VetDoc = () => {
                 "Not Available"
               )}
             </p>
-            <a className="vet-link" href={`https://www.google.com/maps/search/?api=1&query=${vet.geometry.location.lat},${vet.geometry.location.lng}`} target="_blank" rel="noopener noreferrer">
+            <a
+              className="vet-link"
+              href={`https://www.google.com/maps/search/?api=1&query=${vet.geometry.location.lat},${vet.geometry.location.lng}`}
+              target="_blank"
+              rel="noopener noreferrer"
+            >
               🔗 View on Google Maps
             </a>
           </div>
