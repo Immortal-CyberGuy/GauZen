@@ -20,7 +20,6 @@ admin.initializeApp({
 });
 const db = admin.firestore();
 
-// Add Content Security Policy header middleware
 app.use((req, res, next) => {
   res.setHeader(
     "Content-Security-Policy",
@@ -35,10 +34,8 @@ app.use((req, res, next) => {
   next();
 });
 
-// Serve static files from dist (your Vite build output)
 app.use(express.static(path.resolve("./dist")));
 
-// Your existing API routes
 app.get("/api/breed", async (req, res) => {
   const { breedName } = req.query;
   if (!breedName) return res.status(400).json({ error: "Breed name required" });
@@ -117,12 +114,11 @@ app.get("/api/breed-compatibility", async (req, res) => {
   }
 });
 
-// Catch-all handler to serve index.html for SPA routes
-app.get("*", (req, res) => {
+// Fix: use app.get("/*") for catch-all SPA fallback
+app.get("/*", (req, res) => {
   res.sendFile(path.resolve("./dist/index.html"));
 });
 
-// Start server
 app.listen(PORT, () => {
   console.log(`🚀 Server running on http://localhost:${PORT}`);
 });
