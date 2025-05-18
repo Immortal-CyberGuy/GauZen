@@ -107,14 +107,12 @@ app.get("/api/breed-compatibility", async (req, res) => {
     if (!doc.exists) return res.status(404).json({ error: "Breed not found" });
 
     res.json({ partners: doc.data().compatibleBreeds || [] });
-    console.log({ partners: doc.data().compatibleBreeds || [] });
   } catch (error) {
     console.error("🔥 Error fetching compatibility:", error);
     res.status(500).json({ error: "Internal Server Error" });
   }
 });
 
-// Fix: use app.get("/*") for catch-all SPA fallback
 app.get("/*", (req, res) => {
   res.sendFile(path.resolve("./dist/index.html"));
 });
