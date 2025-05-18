@@ -104,19 +104,19 @@ app.get('/api/breed-compatibility', async (req, res) => {
     if (!doc.exists) {
       return res.status(404).json({ error: 'Breed not found' });
     }
+
     const data = doc.data();
     const partners = (data.compatibleBreeds || []).map((partner) => ({
       breed: partner,
-      benefits: Array.isArray(data.benefits?.[partner])
-        ? data.benefits[partner]
-        : []
+      benefits: Array.isArray(data.benefits?.[partner]) ? data.benefits[partner] : []
     }));
     res.json({ partners });
   } catch (error) {
     console.error('🔥 Error fetching compatibility:', error);
-    res.status(500).json({ error: 'Internal Server Error' });
+    res.status(500).json({ error: 'Unable to connect to server' });
   }
 });
+
 
 app.listen(PORT, () => {
   console.log(`🚀 Server is running on port ${PORT}`);
