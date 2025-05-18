@@ -3,14 +3,17 @@ import cors from "cors";
 import dotenv from "dotenv";
 import fetch from "node-fetch";
 import admin from "firebase-admin";
-import path from "path";
+import path, { dirname, resolve } from "path";
+import { fileURLToPath } from "url";
 
 dotenv.config();
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
 
 const app = express();
 const PORT = process.env.PORT || 5000;
 
-// CORS
 app.use(cors());
 
 // ——————————————————————————
@@ -21,13 +24,11 @@ if (!process.env.FIREBASE_SERVICE_ACCOUNT_B64) {
   process.exit(1);
 }
 
-// Decode from Base64 to JSON string
 const serviceAccountJson = Buffer.from(
   process.env.FIREBASE_SERVICE_ACCOUNT_B64,
   "base64"
 ).toString("utf-8");
 
-// Parse JSON
 let serviceAccount;
 try {
   serviceAccount = JSON.parse(serviceAccountJson);
@@ -36,12 +37,10 @@ try {
   process.exit(1);
 }
 
-// Fix escaped newlines in the PEM key
 if (serviceAccount.private_key) {
   serviceAccount.private_key = serviceAccount.private_key.replace(/\\n/g, "\n");
 }
 
-// Initialize Admin SDK
 admin.initializeApp({
   credential: admin.credential.cert(serviceAccount),
 });
@@ -67,7 +66,7 @@ app.use((req, res, next) => {
 // ——————————————————————————
 // 🗂️ Serve Static Files
 // ——————————————————————————
-app.use(express.static(path.resolve("./dist")));
+app.use(express.static(resolve(__dirname, "dist")));
 
 // ——————————————————————————
 // 🔍 API Endpoints
@@ -87,7 +86,13 @@ app.get("/api/breed", async (req, res) => {
 
     const generalData = generalDoc.exists ? Object.values(generalDoc.data()) : [];
     const specificData = specificDoc.exists
-      ? [specificDoc.data().g1, specificDoc.data().g2, specificDoc.data().g3, specificDoc.data().g4, specificDoc.data().g5]
+      ? [
+          specificDoc.data().g1,
+          specificDoc.data().g2,
+          specificDoc.data().g3,
+          specificDoc.data().g4,
+          specificDoc.data().g5,
+        ]
       : [];
 
     res.json({ general: generalData, specific: specificData });
@@ -150,7 +155,7 @@ app.get("/api/breed-compatibility", async (req, res) => {
 // 🔄 SPA Fallback
 // ——————————————————————————
 app.get("/*", (req, res) => {
-  res.sendFile(path.resolve("./dist/index.html"));
+  res.sendFile(resolve(__dirname, "dist", "index.html"));
 });
 
 // ——————————————————————————
