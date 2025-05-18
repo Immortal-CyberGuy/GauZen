@@ -93,7 +93,7 @@ app.get('/api/vets', async (req, res) => {
 });
 
 // Endpoint: Get breed compatibility
-app.get('/api/breed-compatibility', verifyFirebaseToken, async (req, res) => {
+app.get('/api/breed-compatibility', async (req, res) => {
   const { breed } = req.query;
   if (!breed) {
     return res.status(400).json({ error: 'Breed name required' });
