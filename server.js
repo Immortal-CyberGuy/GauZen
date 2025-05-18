@@ -5,10 +5,8 @@ import admin from 'firebase-admin';
 import fetch from 'node-fetch';
 import { Buffer } from 'buffer';
 
-// Load environment variables
 dotenv.config();
 
-// Decode and initialize Firebase Admin SDK
 if (!process.env.FIREBASE_SERVICE_ACCOUNT_B64) {
   console.error('🔥 FIREBASE_SERVICE_ACCOUNT_B64 is not set');
   process.exit(1);
@@ -31,7 +29,10 @@ const db = admin.firestore();
 const app = express();
 const PORT = process.env.PORT || 10000;
 
-// CSP Middleware
+app.use(cors());
+app.use(express.json());
+
+// CSP Middleware (optional, but keep it if you want)
 app.use((req, res, next) => {
   res.setHeader(
     'Content-Security-Policy',
@@ -39,10 +40,6 @@ app.use((req, res, next) => {
   );
   next();
 });
-
-// Middleware
-app.use(cors());
-app.use(express.json());
 
 // Endpoint: Get nearby veterinary clinics
 app.get('/api/vets', async (req, res) => {
@@ -117,9 +114,6 @@ app.get('/api/breed-compatibility', async (req, res) => {
     res.status(500).json({ error: 'Unable to connect to server' });
   }
 });
-
-
-
 
 app.listen(PORT, () => {
   console.log(`🚀 Server is running on port ${PORT}`);
