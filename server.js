@@ -29,7 +29,7 @@ admin.initializeApp({
 const db = admin.firestore();
 
 const app = express();
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 5000;
 
 // CSP Middleware
 app.use((req, res, next) => {
