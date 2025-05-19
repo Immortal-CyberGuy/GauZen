@@ -115,10 +115,13 @@ app.get('/api/breed-compatibility', async (req, res) => {
     }
 
     const data = doc.data();
-    const partners = (data.compatibleBreeds || []).map((partner) => ({
-      breed: partner,
-      benefits: Array.isArray(data.benefits?.[partner]) ? data.benefits[partner] : []
-    }));
+    const partners = (data.compatibleBreeds || []).map((partner) => {
+      const breedObj = typeof partner === 'string' ? { breed: partner } : partner;
+      return {
+        breed: breedObj,
+        benefits: Array.isArray(data.benefits?.[breedObj.breed]) ? data.benefits[breedObj.breed] : []
+      };
+    });
 
     res.json({ partners });
   } catch (error) {
@@ -126,6 +129,7 @@ app.get('/api/breed-compatibility', async (req, res) => {
     res.status(500).json({ error: 'Unable to connect to server' });
   }
 });
+
 
 // ——————————————————————————————
 // 5) START
