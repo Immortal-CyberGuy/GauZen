@@ -7,9 +7,7 @@ import { Buffer } from 'buffer';
 
 dotenv.config();
 
-// ——————————————————————————————
 // 1) FIREBASE SETUP
-// ——————————————————————————————
 if (!process.env.FIREBASE_SERVICE_ACCOUNT_B64) {
   console.error('🔥 FIREBASE_SERVICE_ACCOUNT_B64 is not set');
   process.exit(1);
@@ -29,9 +27,7 @@ admin.initializeApp({
 });
 const db = admin.firestore();
 
-// ——————————————————————————————
 // 2) EXPRESS SETUP
-// ——————————————————————————————
 const app = express();
 const PORT = process.env.PORT || 10000;
 
@@ -47,9 +43,7 @@ app.get('/', (req, res) => {
   res.send('✅ Server is up and running');
 });
 
-// ——————————————————————————————
-// 3) /api/vets
-// ——————————————————————————————
+// 3) /api/vets - Find nearby veterinary clinics
 app.get('/api/vets', async (req, res) => {
   const { lat, lng } = req.query;
   const apiKey = process.env.GOOGLE_MAPS_API_KEY;
@@ -81,7 +75,7 @@ app.get('/api/vets', async (req, res) => {
           const detailData = await detailRes.json();
           return {
             ...place,
-            formatted_phone_number: detailData.result?.formatted_phone_number || null
+            formatted_phone_number: detailData.result?.formatted_phone_number || null,
           };
         } catch (e) {
           console.warn('⚠️ Detail fetch failed:', e);
@@ -97,9 +91,7 @@ app.get('/api/vets', async (req, res) => {
   }
 });
 
-// ——————————————————————————————
-// 4) /api/breed-compatibility
-// ——————————————————————————————
+// 4) /api/breed-compatibility - Get breed compatibility data from Firestore
 app.get('/api/breed-compatibility', async (req, res) => {
   const { breed } = req.query;
   if (!breed) {
@@ -122,9 +114,7 @@ app.get('/api/breed-compatibility', async (req, res) => {
   }
 });
 
-// ——————————————————————————————
 // 5) START SERVER
-// ——————————————————————————————
 app.listen(PORT, () => {
   console.log(`🚀 Server is running on port ${PORT}`);
 });
