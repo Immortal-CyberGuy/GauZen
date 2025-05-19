@@ -230,7 +230,7 @@ const VetDoc = () => {
 
   const calculateDistance = (lat1, lon1, lat2, lon2) => {
     const toRad = (deg) => (deg * Math.PI) / 180;
-    const R = 6371;
+    const R = 6371; // Earth radius in km
     const dLat = toRad(lat2 - lat1);
     const dLon = toRad(lon2 - lon1);
     const a =
@@ -385,4 +385,5 @@ const VetDoc = () => {
 };
 
 export default VetDoc;
+
 
