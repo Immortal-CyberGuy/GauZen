@@ -25,13 +25,12 @@ const Vid = () => {
         Start transforming your experience today.
       </p>
       <div className="video-container">
-        <iframe
+        <video
           className="video-player"
-          src="https://www.youtube.com/embed/r6zIGXun57U"
-          title="GauSeva Introduction"
-          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-          allowFullScreen
-        ></iframe>
+          src="/vdo%20(1)%20(1)%20(1).mp4"
+          controls
+          preload="metadata"
+        />
       </div>
     </div>
   );
