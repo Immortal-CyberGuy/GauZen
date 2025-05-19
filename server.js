@@ -120,7 +120,6 @@
 // });
 
 
-
 import dotenv from 'dotenv';
 import express from 'express';
 import cors from 'cors';
@@ -130,7 +129,9 @@ import { Buffer } from 'buffer';
 
 dotenv.config();
 
+// ——————————————————————————————
 // 1) FIREBASE SETUP
+// ——————————————————————————————
 if (!process.env.FIREBASE_SERVICE_ACCOUNT_B64) {
   console.error('🔥 FIREBASE_SERVICE_ACCOUNT_B64 is not set');
   process.exit(1);
@@ -138,7 +139,10 @@ if (!process.env.FIREBASE_SERVICE_ACCOUNT_B64) {
 
 let serviceAccount;
 try {
-  const decoded = Buffer.from(process.env.FIREBASE_SERVICE_ACCOUNT_B64, 'base64').toString('utf8');
+  const decoded = Buffer.from(
+    process.env.FIREBASE_SERVICE_ACCOUNT_B64,
+    'base64'
+  ).toString('utf8');
   serviceAccount = JSON.parse(decoded);
 } catch (err) {
   console.error('🔥 Failed to parse Firebase service account JSON:', err);
@@ -150,23 +154,27 @@ admin.initializeApp({
 });
 const db = admin.firestore();
 
+// ——————————————————————————————
 // 2) EXPRESS SETUP
+// ——————————————————————————————
 const app = express();
 const PORT = process.env.PORT || 10000;
 
 app.use(cors());
 app.use(express.json());
-
 app.use((req, res, next) => {
   console.log(`➡️  [${new Date().toISOString()}] ${req.method} ${req.url}`);
   next();
 });
 
+// Health check
 app.get('/', (req, res) => {
   res.send('✅ Server is up and running');
 });
 
-// 3) /api/vets - Find nearby veterinary clinics with phone numbers
+// ——————————————————————————————
+// 3) /api/vets — Find nearby veterinary clinics
+// ——————————————————————————————
 app.get('/api/vets', async (req, res) => {
   const { lat, lng } = req.query;
   const apiKey = process.env.GOOGLE_MAPS_API_KEY;
@@ -181,63 +189,63 @@ app.get('/api/vets', async (req, res) => {
   const nearbyUrl = `https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=${lat},${lng}&radius=5000&type=veterinary_care&key=${apiKey}`;
 
   try {
-    const response = await fetch(nearbyUrl);
-    const data = await response.json();
+    const r = await fetch(nearbyUrl);
+    const data = await r.json();
 
     if (!['OK', 'ZERO_RESULTS'].includes(data.status)) {
       console.error('🔥 Google API Error:', data);
       return res.status(500).json({ error: 'Failed to fetch vet data' });
     }
 
-    const enrichedResults = await Promise.all(
+    // Enrich each place with a phone number
+    const results = await Promise.all(
       data.results.map(async (place) => {
         if (!place.place_id) return place;
-        const detailUrl = `https://maps.googleapis.com/maps/api/place/details/json?place_id=${place.place_id}&fields=name,formatted_phone_number&key=${apiKey}`;
         try {
-          const detailRes = await fetch(detailUrl);
-          const detailData = await detailRes.json();
+          const detailUrl = `https://maps.googleapis.com/maps/api/place/details/json?place_id=${place.place_id}&fields=name,formatted_phone_number&key=${apiKey}`;
+          const detailR = await fetch(detailUrl);
+          const detailD = await detailR.json();
           return {
             ...place,
-            formatted_phone_number: detailData.result?.formatted_phone_number || null,
+            formatted_phone_number: detailD.result?.formatted_phone_number || null,
           };
-        } catch (e) {
-          console.warn('⚠️ Detail fetch failed:', e);
+        } catch {
           return { ...place, formatted_phone_number: null };
         }
       })
     );
 
-    res.json({ results: enrichedResults });
-  } catch (error) {
-    console.error('🔥 Error fetching Google Places API:', error);
+    // Return exactly what the frontend expects:
+    //   fetch('/api/vets?...').then(r=>r.json()).then(({ results })=>...)
+    res.json({ results });
+  } catch (err) {
+    console.error('🔥 Error fetching vets:', err);
     res.status(500).json({ error: 'Internal Server Error' });
   }
 });
 
-// 4) /api/breed-compatibility - Get breed compatibility data from Firestore
+// ——————————————————————————————
+// 4) /api/breed-compatibility
+// ——————————————————————————————
 app.get('/api/breed-compatibility', async (req, res) => {
   const { breed } = req.query;
-  if (!breed) {
-    return res.status(400).json({ error: 'Breed name required' });
-  }
+  if (!breed) return res.status(400).json({ error: 'Breed name required' });
 
   try {
     const doc = await db.collection('breed_compatibility').doc(breed).get();
-    if (!doc.exists) {
-      return res.status(404).json({ error: 'Breed not found' });
-    }
-
+    if (!doc.exists) return res.status(404).json({ error: 'Breed not found' });
     const data = doc.data();
-    const partners = data.compatibleBreeds || [];
-
-    res.json({ partners });
-  } catch (error) {
-    console.error('🔥 Error fetching compatibility:', error);
+    res.json({ partners: data.compatibleBreeds || [] });
+  } catch (err) {
+    console.error('🔥 Error fetching compatibility:', err);
     res.status(500).json({ error: 'Unable to connect to server' });
   }
 });
 
+// ——————————————————————————————
 // 5) START SERVER
+// ——————————————————————————————
 app.listen(PORT, () => {
   console.log(`🚀 Server is running on port ${PORT}`);
 });
+
