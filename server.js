@@ -119,7 +119,6 @@
 //   console.log(`Server is running on port ${PORT}`);
 // });
 
-
 import dotenv from 'dotenv';
 import express from 'express';
 import cors from 'cors';
@@ -129,9 +128,7 @@ import { Buffer } from 'buffer';
 
 dotenv.config();
 
-// ——————————————————————————————
 // 1) FIREBASE SETUP
-// ——————————————————————————————
 if (!process.env.FIREBASE_SERVICE_ACCOUNT_B64) {
   console.error('🔥 FIREBASE_SERVICE_ACCOUNT_B64 is not set');
   process.exit(1);
@@ -139,11 +136,9 @@ if (!process.env.FIREBASE_SERVICE_ACCOUNT_B64) {
 
 let serviceAccount;
 try {
-  const decoded = Buffer.from(
-    process.env.FIREBASE_SERVICE_ACCOUNT_B64,
-    'base64'
-  ).toString('utf8');
-  serviceAccount = JSON.parse(decoded);
+  serviceAccount = JSON.parse(
+    Buffer.from(process.env.FIREBASE_SERVICE_ACCOUNT_B64, 'base64').toString('utf8')
+  );
 } catch (err) {
   console.error('🔥 Failed to parse Firebase service account JSON:', err);
   process.exit(1);
@@ -154,9 +149,7 @@ admin.initializeApp({
 });
 const db = admin.firestore();
 
-// ——————————————————————————————
 // 2) EXPRESS SETUP
-// ——————————————————————————————
 const app = express();
 const PORT = process.env.PORT || 10000;
 
@@ -168,55 +161,38 @@ app.use((req, res, next) => {
 });
 
 // Health check
-app.get('/', (req, res) => {
-  res.send('✅ Server is up and running');
-});
+app.get('/', (req, res) => res.send('✅ Server is up and running'));
 
-// ——————————————————————————————
 // 3) /api/vets — Find nearby veterinary clinics
-// ——————————————————————————————
 app.get('/api/vets', async (req, res) => {
   const { lat, lng } = req.query;
   const apiKey = process.env.GOOGLE_MAPS_API_KEY;
-
-  if (!lat || !lng) {
-    return res.status(400).json({ error: 'Latitude and Longitude required' });
-  }
-  if (!apiKey) {
-    return res.status(500).json({ error: 'Google Maps API Key not configured' });
-  }
-
-  const nearbyUrl = `https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=${lat},${lng}&radius=5000&type=veterinary_care&key=${apiKey}`;
+  if (!lat || !lng) return res.status(400).json({ error: 'Latitude and Longitude required' });
+  if (!apiKey) return res.status(500).json({ error: 'Google Maps API Key not configured' });
 
   try {
+    // fetch nearby places
+    const nearbyUrl = `https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=${lat},${lng}&radius=5000&type=veterinary_care&key=${apiKey}`;
     const r = await fetch(nearbyUrl);
     const data = await r.json();
-
-    if (!['OK', 'ZERO_RESULTS'].includes(data.status)) {
+    if (!['OK','ZERO_RESULTS'].includes(data.status)) {
       console.error('🔥 Google API Error:', data);
       return res.status(500).json({ error: 'Failed to fetch vet data' });
     }
 
-    // Enrich each place with a phone number
-    const results = await Promise.all(
-      data.results.map(async (place) => {
-        if (!place.place_id) return place;
-        try {
-          const detailUrl = `https://maps.googleapis.com/maps/api/place/details/json?place_id=${place.place_id}&fields=name,formatted_phone_number&key=${apiKey}`;
-          const detailR = await fetch(detailUrl);
-          const detailD = await detailR.json();
-          return {
-            ...place,
-            formatted_phone_number: detailD.result?.formatted_phone_number || null,
-          };
-        } catch {
-          return { ...place, formatted_phone_number: null };
-        }
-      })
-    );
+    // enrich with phone numbers
+    const results = await Promise.all(data.results.map(async place => {
+      if (!place.place_id) return place;
+      try {
+        const detailUrl = `https://maps.googleapis.com/maps/api/place/details/json?place_id=${place.place_id}&fields=name,formatted_phone_number&key=${apiKey}`;
+        const d = await fetch(detailUrl).then(r=>r.json());
+        return { ...place, formatted_phone_number: d.result?.formatted_phone_number || null };
+      } catch {
+        return { ...place, formatted_phone_number: null };
+      }
+    }));
 
-    // Return exactly what the frontend expects:
-    //   fetch('/api/vets?...').then(r=>r.json()).then(({ results })=>...)
+    // return the array under "results"
     res.json({ results });
   } catch (err) {
     console.error('🔥 Error fetching vets:', err);
@@ -224,13 +200,10 @@ app.get('/api/vets', async (req, res) => {
   }
 });
 
-// ——————————————————————————————
 // 4) /api/breed-compatibility
-// ——————————————————————————————
 app.get('/api/breed-compatibility', async (req, res) => {
   const { breed } = req.query;
   if (!breed) return res.status(400).json({ error: 'Breed name required' });
-
   try {
     const doc = await db.collection('breed_compatibility').doc(breed).get();
     if (!doc.exists) return res.status(404).json({ error: 'Breed not found' });
@@ -242,10 +215,6 @@ app.get('/api/breed-compatibility', async (req, res) => {
   }
 });
 
-// ——————————————————————————————
 // 5) START SERVER
-// ——————————————————————————————
-app.listen(PORT, () => {
-  console.log(`🚀 Server is running on port ${PORT}`);
-});
+app.listen(PORT, () => console.log(`🚀 Server is running on port ${PORT}`));
 
