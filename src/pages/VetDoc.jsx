@@ -229,13 +229,6 @@ const VetDoc = () => {
     }
   }, []);
 
-  // Automatically fetch vets when location updates
-  useEffect(() => {
-    if (location) {
-      fetchVetDoctors();
-    }
-  }, [location]);
-
   const calculateDistance = (lat1, lon1, lat2, lon2) => {
     const toRad = (deg) => (deg * Math.PI) / 180;
     const R = 6371;
@@ -253,58 +246,38 @@ const VetDoc = () => {
       setError("Location not available.");
       return;
     }
-
     setIsLoading(true);
     setError("");
 
     try {
-      const response = await fetch(
-        `${BACKEND_URL}/api/vets?lat=${location.lat}&lng=${location.lng}`,
-        {
-          method: "GET",
-          headers: {
-            Accept: "application/json",
-          },
-        }
-      );
-
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-
+      console.log(`Fetching vets from backend: ${BACKEND_URL}/api/vets?lat=${location.lat}&lng=${location.lng}`);
+      const response = await fetch(`${BACKEND_URL}/api/vets?lat=${location.lat}&lng=${location.lng}`, {
+        method: "GET",
+        headers: { Accept: "application/json" },
+      });
+      if (!response.ok) throw new Error(`Error status: ${response.status}`);
       const data = await response.json();
+
       if (data.results) {
         setVetDoctors(data.results);
       } else {
-        throw new Error(data.status || "Failed to fetch vet data");
+        setError("No vets found.");
       }
     } catch (err) {
-      console.error("Fetch error:", err);
-      setError(
-        "Unable to fetch vet data. Please ensure the backend server is running and try again."
-      );
+      console.error(err);
+      setError("Failed to fetch vet data.");
     } finally {
       setIsLoading(false);
     }
   };
 
   const sortedVets = [...vetDoctors].sort((a, b) => {
-    if (sortType === "rating") {
-      return (b.rating || 0) - (a.rating || 0);
-    } else if (sortType === "distance" && location) {
-      const distA = calculateDistance(
-        location.lat,
-        location.lng,
-        a.geometry.location.lat,
-        a.geometry.location.lng
+    if (sortType === "rating") return (b.rating || 0) - (a.rating || 0);
+    if (sortType === "distance" && location) {
+      return (
+        calculateDistance(location.lat, location.lng, a.geometry.location.lat, a.geometry.location.lng) -
+        calculateDistance(location.lat, location.lng, b.geometry.location.lat, b.geometry.location.lng)
       );
-      const distB = calculateDistance(
-        location.lat,
-        location.lng,
-        b.geometry.location.lat,
-        b.geometry.location.lng
-      );
-      return distA - distB;
     }
     return 0;
   });
@@ -321,42 +294,28 @@ const VetDoc = () => {
       {error && <p className="error">{error}</p>}
 
       <div className="map-container">
-        <GoogleMap
-          mapContainerStyle={mapContainerStyle}
-          zoom={12}
-          center={location || defaultCenter}
-        >
+        <GoogleMap mapContainerStyle={mapContainerStyle} zoom={12} center={location || defaultCenter}>
           {location && <Marker position={location} title="Your Location" />}
-          {vetDoctors.map((vet, index) => (
+          {vetDoctors.map((vet, i) => (
             <Marker
-              key={index}
-              position={{
-                lat: vet.geometry.location.lat,
-                lng: vet.geometry.location.lng,
-              }}
+              key={i}
+              position={{ lat: vet.geometry.location.lat, lng: vet.geometry.location.lng }}
               onClick={() => setSelectedVet(vet)}
             />
           ))}
           {selectedVet && (
             <InfoWindow
-              position={{
-                lat: selectedVet.geometry.location.lat,
-                lng: selectedVet.geometry.location.lng,
-              }}
+              position={{ lat: selectedVet.geometry.location.lat, lng: selectedVet.geometry.location.lng }}
               onCloseClick={() => setSelectedVet(null)}
             >
               <div>
                 <h3>{selectedVet.name}</h3>
                 <p>{selectedVet.vicinity}</p>
-                <p>
-                  <strong>Rating:</strong> {selectedVet.rating || "N/A"}
-                </p>
+                <p><strong>Rating:</strong> {selectedVet.rating || "N/A"}</p>
                 {selectedVet.formatted_phone_number && (
                   <p>
                     <strong>Phone:</strong>{" "}
-                    <a href={`tel:${selectedVet.formatted_phone_number}`}>
-                      {selectedVet.formatted_phone_number}
-                    </a>
+                    <a href={`tel:${selectedVet.formatted_phone_number}`}>{selectedVet.formatted_phone_number}</a>
                   </p>
                 )}
               </div>
@@ -367,30 +326,20 @@ const VetDoc = () => {
 
       <div className="sort-container">
         <span className="sort-title">Sort By:</span>
-        <button className="sort-button" onClick={() => setSortType("rating")}>
-          ⭐ Rating
-        </button>
-        <button className="sort-button" onClick={() => setSortType("distance")}>
-          📍 Distance
-        </button>
+        <button className="sort-button" onClick={() => setSortType("rating")}>⭐ Rating</button>
+        <button className="sort-button" onClick={() => setSortType("distance")}>📍 Distance</button>
       </div>
 
       <div className="vet-list">
-        {sortedVets.map((vet, index) => (
-          <div key={index} className="vet-card">
+        {sortedVets.map((vet, i) => (
+          <div key={i} className="vet-card">
             <h3 className="vet-name">{vet.name}</h3>
-            <p className="vet-info">
-              <strong>📍 Address:</strong> {vet.vicinity}
-            </p>
-            <p className="vet-info">
-              <strong>⭐ Rating:</strong> {vet.rating || "N/A"}
-            </p>
+            <p className="vet-info"><strong>📍 Address:</strong> {vet.vicinity}</p>
+            <p className="vet-info"><strong>⭐ Rating:</strong> {vet.rating || "N/A"}</p>
             <p className="vet-info">
               <strong>📞 Phone:</strong>{" "}
               {vet.formatted_phone_number ? (
-                <a href={`tel:${vet.formatted_phone_number}`} className="phone-link">
-                  {vet.formatted_phone_number}
-                </a>
+                <a href={`tel:${vet.formatted_phone_number}`} className="phone-link">{vet.formatted_phone_number}</a>
               ) : (
                 "Not Available"
               )}
@@ -411,4 +360,3 @@ const VetDoc = () => {
 };
 
 export default VetDoc;
-
