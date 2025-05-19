@@ -35,17 +35,14 @@ const db = admin.firestore();
 const app = express();
 const PORT = process.env.PORT || 10000;
 
-// Enable CORS for all origins
 app.use(cors());
 app.use(express.json());
 
-// Simple request logger
 app.use((req, res, next) => {
   console.log(`➡️  [${new Date().toISOString()}] ${req.method} ${req.url}`);
   next();
 });
 
-// Health check
 app.get('/', (req, res) => {
   res.send('✅ Server is up and running');
 });
@@ -65,6 +62,7 @@ app.get('/api/vets', async (req, res) => {
   }
 
   const nearbyUrl = `https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=${lat},${lng}&radius=5000&type=veterinary_care&key=${apiKey}`;
+
   try {
     const response = await fetch(nearbyUrl);
     const data = await response.json();
@@ -115,13 +113,7 @@ app.get('/api/breed-compatibility', async (req, res) => {
     }
 
     const data = doc.data();
-    const partners = (data.compatibleBreeds || []).map((partner) => {
-      const breedObj = typeof partner === 'string' ? { breed: partner } : partner;
-      return {
-        breed: breedObj,
-        benefits: Array.isArray(data.benefits?.[breedObj.breed]) ? data.benefits[breedObj.breed] : []
-      };
-    });
+    const partners = data.compatibleBreeds || [];
 
     res.json({ partners });
   } catch (error) {
@@ -130,9 +122,8 @@ app.get('/api/breed-compatibility', async (req, res) => {
   }
 });
 
-
 // ——————————————————————————————
-// 5) START
+// 5) START SERVER
 // ——————————————————————————————
 app.listen(PORT, () => {
   console.log(`🚀 Server is running on port ${PORT}`);
