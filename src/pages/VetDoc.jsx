@@ -197,6 +197,7 @@
 // };
 
 // export default VetDoc;
+
 import { useState, useEffect } from "react";
 import { GoogleMap, Marker, InfoWindow, useLoadScript } from "@react-google-maps/api";
 import "../style/VetDoc.css";
@@ -204,7 +205,7 @@ import "../style/VetDoc.css";
 const mapContainerStyle = { width: "100%", height: "500px" };
 const defaultCenter = { lat: 20.5937, lng: 78.9629 };
 
-export default function VetDoc() {
+function VetDoc() {
   const [location, setLocation] = useState(null);
   const [vets, setVets] = useState([]);
   const [selected, setSelected] = useState(null);
@@ -216,17 +217,19 @@ export default function VetDoc() {
     googleMapsApiKey: import.meta.env.VITE_GOOGLE_MAPS_API_KEY,
   });
 
-  // get user location
+  // 1) get user location
   useEffect(() => {
-    navigator.geolocation
-      ? navigator.geolocation.getCurrentPosition(
-          (p) => setLocation({ lat: p.coords.latitude, lng: p.coords.longitude }),
-          () => setError("Unable to fetch location.")
-        )
-      : setError("Geolocation not supported.");
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        (p) => setLocation({ lat: p.coords.latitude, lng: p.coords.longitude }),
+        () => setError("Unable to fetch location.")
+      );
+    } else {
+      setError("Geolocation not supported.");
+    }
   }, []);
 
-  // distance util
+  // 2) distance helper
   const dist = (a, b) => {
     const toRad = (d) => (d * Math.PI) / 180;
     const R = 6371;
@@ -238,9 +241,12 @@ export default function VetDoc() {
     return R * 2 * Math.atan2(Math.sqrt(h), Math.sqrt(1 - h));
   };
 
-  // fetch vets
+  // 3) fetch vets from your Render backend
   const fetchVets = async () => {
-    if (!location) return setError("Location not available.");
+    if (!location) {
+      setError("Location not available.");
+      return;
+    }
     setLoading(true);
     setError("");
     setSelected(null);
@@ -263,7 +269,7 @@ export default function VetDoc() {
     }
   };
 
-  // sort results
+  // 4) sort vets by rating or distance
   const sorted = [...vets].sort((a, b) =>
     sortBy === "rating"
       ? (b.rating || 0) - (a.rating || 0)
@@ -330,7 +336,6 @@ export default function VetDoc() {
               📍 Distance
             </button>
           </div>
-
           <div className="vet-list">
             {sorted.map((v, i) => (
               <div key={i} className="vet-card">
@@ -360,4 +365,5 @@ export default function VetDoc() {
     </div>
   );
 }
+
 export default VetDoc;
