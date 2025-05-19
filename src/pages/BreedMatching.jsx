@@ -32,6 +32,7 @@ const BreedMatching = () => {
     } else {
       setSuggestions([]);
       setMatchingBreeds([]);
+      setError("");
     }
   };
 
@@ -43,7 +44,7 @@ const BreedMatching = () => {
     setError("");
 
     try {
-      const response = await fetch(`https://gauzen.onrender.com/api/breed-compatibility?breed=${breed}`);
+      const response = await fetch(`https://gauzen.onrender.com/api/breed-compatibility?breed=${encodeURIComponent(breed)}`);
       const data = await response.json();
 
       if (data.error) {
@@ -51,9 +52,9 @@ const BreedMatching = () => {
       } else {
         setMatchingBreeds(data.partners || []);
       }
-    } catch (error) {
+    } catch (err) {
+      console.error("Error fetching breed compatibility:", err);
       setError("Failed to fetch breed compatibility data. Please try again.");
-      console.error("Error fetching breed compatibility:", error);
     } finally {
       setLoading(false);
     }
@@ -65,7 +66,6 @@ const BreedMatching = () => {
         setSuggestions([]);
       }
     };
-
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
@@ -83,9 +83,9 @@ const BreedMatching = () => {
 
       {suggestions.length > 0 && (
         <ul className="suggestions-list">
-          {suggestions.map((breed, index) => (
-            <li key={index} className="suggestion-item" onClick={() => handleSelect(breed)}>
-              {breed}
+          {suggestions.map((b, i) => (
+            <li key={i} className="suggestion-item" onClick={() => handleSelect(b)}>
+              {b}
             </li>
           ))}
         </ul>
@@ -98,24 +98,24 @@ const BreedMatching = () => {
         </div>
       )}
 
-      {error && (
-        <div className="error-message">
-          {error}
-        </div>
-      )}
+      {error && <div className="error-message">{error}</div>}
 
-      {matchingBreeds.length > 0 && !loading && (
+      {matchingBreeds.length > 0 && !loading && !error && (
         <div className="results-container">
           <h4>Best Breeding Partners for {query}</h4>
           <div className="breed-cards-grid">
-            {matchingBreeds.map((partner, index) => (
-              <div key={index} className="breed-card">
-                <h4>{partner.breed}</h4>
+            {matchingBreeds.map((partner, idx) => (
+              <div key={idx} className="breed-card">
+                <h4>
+                  {typeof partner.breed === "string"
+                    ? partner.breed
+                    : partner.breed.breed}
+                </h4>
                 <div className="compatibility-score">
                   {Math.floor(Math.random() * 20 + 80)}% Match
                 </div>
                 <ul>
-                  {partner.benefits.map((benefit, i) => (
+                  {(partner.benefits || []).map((benefit, i) => (
                     <li key={i}>{benefit}</li>
                   ))}
                 </ul>
