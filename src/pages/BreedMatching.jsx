@@ -43,9 +43,9 @@ const BreedMatching = () => {
     setError("");
 
     try {
-      const response = await fetch(`/api/breed-compatibility?breed=${breed}`);
+      const response = await fetch(`https://gauzen.onrender.com/api/breed-compatibility?breed=${breed}`);
       const data = await response.json();
-      
+
       if (data.error) {
         setError(data.error);
       } else {
@@ -80,7 +80,7 @@ const BreedMatching = () => {
         onChange={handleChange}
         className="search-input"
       />
-      
+
       {suggestions.length > 0 && (
         <ul className="suggestions-list">
           {suggestions.map((breed, index) => (
