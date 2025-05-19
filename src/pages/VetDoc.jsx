@@ -205,6 +205,11 @@ import "../style/VetDoc.css";
 const mapContainerStyle = { width: "100%", height: "500px" };
 const defaultCenter = { lat: 20.5937, lng: 78.9629 };
 
+const BACKEND_URL =
+  window.location.hostname === "localhost"
+    ? "http://localhost:10000"
+    : "https://gauzen.onrender.com";
+
 function VetDoc() {
   const [location, setLocation] = useState(null);
   const [vets, setVets] = useState([]);
@@ -217,19 +222,17 @@ function VetDoc() {
     googleMapsApiKey: import.meta.env.VITE_GOOGLE_MAPS_API_KEY,
   });
 
-  // 1) get user location
   useEffect(() => {
-    if (navigator.geolocation) {
-      navigator.geolocation.getCurrentPosition(
-        (p) => setLocation({ lat: p.coords.latitude, lng: p.coords.longitude }),
-        () => setError("Unable to fetch location.")
-      );
-    } else {
+    if (!navigator.geolocation) {
       setError("Geolocation not supported.");
+      return;
     }
+    navigator.geolocation.getCurrentPosition(
+      (p) => setLocation({ lat: p.coords.latitude, lng: p.coords.longitude }),
+      () => setError("Unable to fetch location.")
+    );
   }, []);
 
-  // 2) distance helper
   const dist = (a, b) => {
     const toRad = (d) => (d * Math.PI) / 180;
     const R = 6371;
@@ -237,22 +240,22 @@ function VetDoc() {
     const dLng = toRad(b.lng - a.lng);
     const h =
       Math.sin(dLat / 2) ** 2 +
-      Math.cos(toRad(a.lat)) * Math.cos(toRad(b.lat)) * Math.sin(dLng / 2) ** 2;
+      Math.cos(toRad(a.lat)) *
+        Math.cos(toRad(b.lat)) *
+        Math.sin(dLng / 2) ** 2;
     return R * 2 * Math.atan2(Math.sqrt(h), Math.sqrt(1 - h));
   };
 
-  // 3) fetch vets from your Render backend
   const fetchVets = async () => {
-    if (!location) {
-      setError("Location not available.");
-      return;
-    }
+    if (!location) return setError("Location not available.");
     setLoading(true);
     setError("");
     setSelected(null);
 
     try {
-      const res = await fetch(`/api/vets?lat=${location.lat}&lng=${location.lng}`);
+      const res = await fetch(
+        `${BACKEND_URL}/api/vets?lat=${location.lat}&lng=${location.lng}`
+      );
       if (!res.ok) throw new Error(`Status ${res.status}`);
       const { results } = await res.json();
       if (Array.isArray(results) && results.length) {
@@ -263,13 +266,14 @@ function VetDoc() {
       }
     } catch (e) {
       console.error(e);
-      setError("Failed to fetch vet data. Is the backend running?");
+      setError(
+        "Failed to fetch vet data. Make sure your backend is running, and CORS is allowed."
+      );
     } finally {
       setLoading(false);
     }
   };
 
-  // 4) sort vets by rating or distance
   const sorted = [...vets].sort((a, b) =>
     sortBy === "rating"
       ? (b.rating || 0) - (a.rating || 0)
@@ -282,13 +286,21 @@ function VetDoc() {
   return (
     <div className="vet-container">
       <h2>Smart Vet Locator</h2>
-      <button onClick={fetchVets} disabled={loading || !location} className="fetch-button">
+      <button
+        onClick={fetchVets}
+        disabled={loading || !location}
+        className="fetch-button"
+      >
         {loading ? "Loading…" : "Find Nearby Vets"}
       </button>
       {error && <p className="error">{error}</p>}
 
       <div className="map-container">
-        <GoogleMap mapContainerStyle={mapContainerStyle} zoom={12} center={location || defaultCenter}>
+        <GoogleMap
+          mapContainerStyle={mapContainerStyle}
+          zoom={12}
+          center={location || defaultCenter}
+        >
           {location && <Marker position={location} title="You" />}
           {vets.map((v, i) => (
             <Marker
@@ -305,7 +317,9 @@ function VetDoc() {
               <div>
                 <h3>{selected.name}</h3>
                 <p>{selected.vicinity}</p>
-                <p><strong>Rating:</strong> {selected.rating || "N/A"}</p>
+                <p>
+                  <strong>Rating:</strong> {selected.rating || "N/A"}
+                </p>
                 {selected.formatted_phone_number && (
                   <p>
                     <strong>Phone:</strong>{" "}
@@ -324,28 +338,35 @@ function VetDoc() {
         <>
           <div className="sort-container">
             <button
-              className={`sort-button ${sortBy === "rating" ? "active" : ""}`}
+              className={`sort-button ${sortBy === "rating" && "active"}`}
               onClick={() => setSortBy("rating")}
             >
               ⭐ Rating
             </button>
             <button
-              className={`sort-button ${sortBy === "distance" ? "active" : ""}`}
+              className={`sort-button ${sortBy === "distance" && "active"}`}
               onClick={() => setSortBy("distance")}
             >
               📍 Distance
             </button>
           </div>
+
           <div className="vet-list">
             {sorted.map((v, i) => (
               <div key={i} className="vet-card">
                 <h3>{v.name}</h3>
-                <p><strong>Address:</strong> {v.vicinity}</p>
-                <p><strong>Rating:</strong> {v.rating || "N/A"}</p>
+                <p>
+                  <strong>Address:</strong> {v.vicinity}
+                </p>
+                <p>
+                  <strong>Rating:</strong> {v.rating || "N/A"}
+                </p>
                 <p>
                   <strong>Phone:</strong>{" "}
                   {v.formatted_phone_number ? (
-                    <a href={`tel:${v.formatted_phone_number}`}>{v.formatted_phone_number}</a>
+                    <a href={`tel:${v.formatted_phone_number}`}>
+                      {v.formatted_phone_number}
+                    </a>
                   ) : (
                     "Not available"
                   )}
