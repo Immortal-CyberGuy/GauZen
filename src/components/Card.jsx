@@ -51,7 +51,7 @@ const Card = () => {
         <a href="https://www.linkedin.com/in/real-shubham-garg/" target="_blank" rel="noopener noreferrer" className="dock-item">
           <FaLinkedin className="dock-icon" />
         </a>
-        <a href="https://instagram.com/cyberzenith57" target="_blank" rel="noopener noreferrer" className="dock-item">
+        <a href="https://instagram.com/gargshubham2411" target="_blank" rel="noopener noreferrer" className="dock-item">
           <FaInstagram className="dock-icon" />
         </a>
       </div>
