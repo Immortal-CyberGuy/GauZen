@@ -198,7 +198,6 @@
 
 // export default VetDoc;
 
-
 import { useState, useEffect } from "react";
 import { GoogleMap, Marker, InfoWindow, useLoadScript } from "@react-google-maps/api";
 import "../style/VetDoc.css";
@@ -229,6 +228,13 @@ const VetDoc = () => {
       setError("Geolocation not supported.");
     }
   }, []);
+
+  // Automatically fetch vets when location updates
+  useEffect(() => {
+    if (location) {
+      fetchVetDoctors();
+    }
+  }, [location]);
 
   const calculateDistance = (lat1, lon1, lat2, lon2) => {
     const toRad = (deg) => (deg * Math.PI) / 180;
