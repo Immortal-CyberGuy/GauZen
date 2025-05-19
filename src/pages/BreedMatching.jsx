@@ -20,15 +20,13 @@ const BreedMatching = () => {
   const [error, setError] = useState("");
   const searchRef = useRef(null);
 
-  const handleChange = (event) => {
-    const input = event.target.value;
+  const handleChange = (e) => {
+    const input = e.target.value;
     setQuery(input);
-
-    if (input.length > 0) {
-      const filtered = breedList
-        .filter(b => b.toLowerCase().includes(input.toLowerCase()))
-        .slice(0, 6);
-      setSuggestions(filtered);
+    if (input) {
+      setSuggestions(
+        breedList.filter(b => b.toLowerCase().includes(input.toLowerCase())).slice(0, 6)
+      );
     } else {
       setSuggestions([]);
       setMatchingBreeds([]);
@@ -44,41 +42,42 @@ const BreedMatching = () => {
     setError("");
 
     try {
-      const response = await fetch(`https://gauzen.onrender.com/api/breed-compatibility?breed=${encodeURIComponent(breed)}`);
-      const data = await response.json();
-
+      const res = await fetch(
+        `https://gauzen.onrender.com/api/breed-compatibility?breed=${encodeURIComponent(breed)}`
+      );
+      const data = await res.json();
       if (data.error) {
         setError(data.error);
       } else {
         setMatchingBreeds(data.partners || []);
       }
     } catch (err) {
-      console.error("Error fetching breed compatibility:", err);
-      setError("Failed to fetch breed compatibility data. Please try again.");
+      console.error(err);
+      setError("Failed to fetch breed compatibility. Please try again.");
     } finally {
       setLoading(false);
     }
   };
 
   useEffect(() => {
-    const handleClickOutside = (e) => {
+    const onClickOutside = (e) => {
       if (searchRef.current && !searchRef.current.contains(e.target)) {
         setSuggestions([]);
       }
     };
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => document.removeEventListener("mousedown", handleClickOutside);
+    document.addEventListener("mousedown", onClickOutside);
+    return () => document.removeEventListener("mousedown", onClickOutside);
   }, []);
 
   return (
     <div className="search-container" ref={searchRef}>
       <h2>Find Your Perfect Breeding Match</h2>
       <input
+        className="search-input"
         type="text"
-        placeholder="Enter breed name to find compatible partners..."
+        placeholder="Enter breed name..."
         value={query}
         onChange={handleChange}
-        className="search-input"
       />
 
       {suggestions.length > 0 && (
@@ -93,29 +92,25 @@ const BreedMatching = () => {
 
       {loading && (
         <div className="loading-container">
-          <div className="loader"></div>
-          <span className="loading-text">Finding perfect matches...</span>
+          <div className="loader" />
+          <span className="loading-text">Finding matches...</span>
         </div>
       )}
 
       {error && <div className="error-message">{error}</div>}
 
-      {matchingBreeds.length > 0 && !loading && !error && (
+      {!loading && !error && matchingBreeds.length > 0 && (
         <div className="results-container">
           <h4>Best Breeding Partners for {query}</h4>
           <div className="breed-cards-grid">
             {matchingBreeds.map((partner, idx) => (
               <div key={idx} className="breed-card">
-                <h4>
-                  {typeof partner.breed === "string"
-                    ? partner.breed
-                    : partner.breed.breed}
-                </h4>
+                <h4>{partner.breed}</h4>
                 <div className="compatibility-score">
-                  {Math.floor(Math.random() * 20 + 80)}% Match
+                  {Math.floor(Math.random() * 21) + 80}% Match
                 </div>
                 <ul>
-                  {(partner.benefits || []).map((benefit, i) => (
+                  {partner.benefits.map((benefit, i) => (
                     <li key={i}>{benefit}</li>
                   ))}
                 </ul>
